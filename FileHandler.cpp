@@ -62,19 +62,25 @@ namespace FileHandler{
     }
 
     // @ari: Debating whether to make this a void or keep it that way
-    std::string FileHandler::ReadFile(const std::string& file){
-        const std::ios_base::openmode mode = std::ios_base::in;
+    std::vector<std::string> FileHandler::ReadFile(const std::string& file){
+        constexpr std::ios_base::openmode mode = std::ios_base::in;
 
-        std::string buffer;
-        std::ifstream fileStream(file, mode);
+        std::vector<std::string> lines_v{};
         
+        std::string buffer;
+        try{
+            while(std::getline(m_fileStream, buffer)){
+                lines_v.emplace_back(buffer);
+            }
+            return lines_v;
+        }
+        catch(const std::exception& e){
+            std::cout << e.what() << std::endl;
+            return lines_v;
+        }
     }
 
     bool FileHandler::FileExists(const std::string& fileName, const std::string_view directory){
-        if(ScanDirectoryForFile(fileName, directory)){
-            return true;
-        }
-        return false;
     }
 
     bool FileHandler::ScanDirectoryForFile(const std::string_view fileName, const std::string_view directory){
@@ -87,7 +93,7 @@ namespace FileHandler{
             throw std::invalid_argument("Invalid file name");
         }
 
-        std::filesystem::path fullPath = dirPath / filePath;
+        const std::filesystem::path fullPath = dirPath / filePath;
 
         return std::filesystem::exists(fullPath) && std::filesystem::is_regular_file(fullPath);
     }

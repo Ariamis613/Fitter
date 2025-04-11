@@ -34,7 +34,7 @@ public:
     bool FileExists(const std::string& fileName, const std::string_view directory);
     void CloseFile();
     void OpenFile(const std::string& filename, FileMode mode);
-    std::string ReadFile(const std::string& file);
+    std::vector<std::string> ReadFile(const std::string& file);
     bool MoveFile(const std::string_view source, const std::string_view destination);
 
 private:
