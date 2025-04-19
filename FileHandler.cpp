@@ -3,10 +3,18 @@
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <sys/stat.h>
+
+#ifdef _WIN32
+constexpr std::string_view WinPath = "C:\\Users\\$USER$\\Documents";
+#else
+constexpr std::string_view LinuxPath = "/home/$USER/Documents";
+#endif
 
 namespace FileHandler{
     
-    explicit FileHandler::FileHandler(std::fstream& fileStream) : m_fileStream(fileStream) {}
+    FileHandler::FileHandler(std::fstream& fileStream) : m_fileStream(fileStream) {}
+
     FileHandler::~FileHandler(){
         CloseFile();
     }
@@ -67,7 +75,8 @@ namespace FileHandler{
 
         std::vector<std::string> lines_v{};
         
-        std::string buffer;
+        std::string buffer{};
+
         try{
             while(std::getline(m_fileStream, buffer)){
                 lines_v.emplace_back(buffer);
@@ -80,11 +89,10 @@ namespace FileHandler{
         }
     }
 
-    bool FileHandler::FileExists(const std::string& fileName, const std::string_view directory){
-    }
+    bool FileHandler::ScanDirectoryForFile(std::string_view fileName, std::string_view directory){
 
-    bool FileHandler::ScanDirectoryForFile(const std::string_view fileName, const std::string_view directory){
         std::filesystem::path dirPath(directory);
+
         if(!std::filesystem::is_directory(directory)){
             throw std::invalid_argument("Provided directory is invalid"); 
         }
@@ -98,13 +106,41 @@ namespace FileHandler{
         return std::filesystem::exists(fullPath) && std::filesystem::is_regular_file(fullPath);
     }
 
-    void FileHandler::CreateFile(){
+    void FileHandler::CreateFile(const std::string& fileName){
         CloseFile();
 
+        #ifdef _WIN32
+        const std::string directory = "C:\\Users\\$USER$\\Documents";
+        #else
+        const std::string directory = "/home/$USER/Documents";
+        #endif
 
+        try{
+            if(ScanDirectoryForFile(fileName, directory)){
+                throw std::runtime_error("File already exists!");
+            }
+
+            #ifdef _WIN32
+            const std::string fullPath = directory + "\\" + fileName;
+            #else
+            const std::string fullPath = directory + "/" + fileName;
+            #endif
+
+            std::ofstream newFile(fullPath);
+            if(!newFile.is_open()){
+                throw std::runtime_error("Newly created file is not open!");
+            }
+
+            newFile.close();
+            
+            printf("File created successfully: %s\n", fullPath.c_str());
+        }
+        catch(const std::exception& e){
+            std::cout << e.what() << std::endl;
+        }
     }
 
-    bool FileHandler::MoveFile(const std::string_view source, const std::string_view destination){
+     bool FileHandler::MoveFile(std::string_view source, std::string_view destination){
         try{
             std::filesystem::rename(source, destination);
             return true;
@@ -112,6 +148,15 @@ namespace FileHandler{
         catch(const std::exception& e){
             std::cout << e.what() << std::endl;
             return false;
+        }
+    }
+
+    bool FileHandler::DeleteFile(std::string_view fileName){
+        try{
+            return std::filesystem::remove(fileName);
+        }
+        catch(const std::exception& e){
+            std::cout << e.what() << std::endl;
         }
     }
 } //namespace FileHandler

@@ -20,13 +20,14 @@ class Fitter{
   int getWeightLBS() const {return m_weight_lbs;}
   
   std::vector<Fitter> LogExercise(const Fitter& exercise);
+
   //@squeeze: TODO
+
   void Start();
   void PrintExerciseObject(const Fitter& ex);
   void PrintExerciseVector(const std::vector<Fitter>& exercises);
   void ClearScreen() const;
   void Update();
-  //* returns user's input
   Fitter DisplayMenu();
   friend std::ostream& operator<<(std::ostream& os, const Fitter& obj);
 
