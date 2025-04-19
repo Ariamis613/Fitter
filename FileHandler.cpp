@@ -5,11 +5,7 @@
 #include <string>
 #include <sys/stat.h>
 
-#ifdef _WIN32
-constexpr std::string_view WinPath = "C:\\Users\\$USER$\\Documents";
-#else
-constexpr std::string_view LinuxPath = "/home/$USER/Documents";
-#endif
+
 
 namespace FileHandler{
     
@@ -71,6 +67,7 @@ namespace FileHandler{
 
     // @ari: Debating whether to make this a void or keep it that way
     std::vector<std::string> FileHandler::ReadFile(const std::string& file){
+
         constexpr std::ios_base::openmode mode = std::ios_base::in;
 
         std::vector<std::string> lines_v{};
@@ -89,7 +86,7 @@ namespace FileHandler{
         }
     }
 
-    bool FileHandler::ScanDirectoryForFile(std::string_view fileName, std::string_view directory){
+    bool FileHandler::ScanDirectoryForFile(std::string_view fileName, const std::string& directory){
 
         std::filesystem::path dirPath(directory);
 
@@ -106,37 +103,89 @@ namespace FileHandler{
         return std::filesystem::exists(fullPath) && std::filesystem::is_regular_file(fullPath);
     }
 
-    void FileHandler::CreateFile(const std::string& fileName){
-        CloseFile();
+    std::string_view GetSubdirectory(){
+
+
+        std::string subdirectory{};
+        while(true){
+            std::cout << "Enter the subdirectory name: (e.g 'Desktop')";
+            std::getline(std::cin, subdirectory);
+
+            if(subdirectory.empty()){
+                std::cerr << "Subdirectory name cannot be empty!" << std::endl;
+                continue;
+            }
+
+            for(const auto& delim : directoryDelimiters){
+                if(subdirectory.find(delim) != std::string::npos){
+                    std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', '..' or ':'" << std::endl;
+                    continue;
+                }
+            }
+
+            break;
+
+        }
+
+        return subdirectory;
+
+    }
+
+    std::filesystem::path FileHandler::GetUserDirectory(std::string_view subdirectory) const{
+        //@NOTE: TODO
+        std::filesystem::path directory{};
+        std::string_view defaultDir = "Documents";
 
         #ifdef _WIN32
-        const std::string directory = "C:\\Users\\$USER$\\Documents";
+        const char* userProfile = std::getenv("USERPROFILE");
+        if(!userProfile){
+            throw std::runtime_error("Failed to resolve user profile directory!");
+        }
+        if(!std::filesystem::exists(defaultDir)){
+            directory = std::filesystem::path(userProfile) / subdirectory;
+            return directory;
+        }
         #else
-        const std::string directory = "/home/$USER/Documents";
+        const char* userProfile = std::getenv("HOME");
+        if(!userProfile){
+            throw std::runtime_error("Failed to resolve user profile directory!");      
+        }
+        if(!std::filesystem::exists(defaultDir)){
+            directory = std::filesystem::path(userProfile) / subdirectory;
+            return directory;
+        }
         #endif
+    }
+
+    bool FileHandler::CreateFile(const std::string& fileName){
+        CloseFile();
+
+        std::string_view userSubdirectory = GetSubdirectory();
+        std::filesystem::path subdirectory = GetUserDirectory(userSubdirectory);
 
         try{
-            if(ScanDirectoryForFile(fileName, directory)){
+            if(std::filesystem::exists(fileName)){
                 throw std::runtime_error("File already exists!");
             }
 
             #ifdef _WIN32
-            const std::string fullPath = directory + "\\" + fileName;
+            const std::filesystem::path fullPath = subdirectory / fileName;
             #else
-            const std::string fullPath = directory + "/" + fileName;
+            const std::filesystem::path fullPath = subdirectory / fileName;
             #endif
 
             std::ofstream newFile(fullPath);
-            if(!newFile.is_open()){
-                throw std::runtime_error("Newly created file is not open!");
-            }
 
-            newFile.close();
+            if(!newFile.is_open()){
+                throw std::runtime_error("Failed to create file: " + fullPath.string());
+            }
             
-            printf("File created successfully");
+            std::cout << "File created successfully!: " << fullPath << std::endl;
+            return true;
         }
         catch(const std::exception& e){
-            std::cout << e.what() << std::endl;
+            std::cerr << "Error:" << e.what() << std::endl;
+            return false;
         }
     }
 
