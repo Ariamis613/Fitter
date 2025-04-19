@@ -133,7 +133,7 @@ namespace FileHandler{
 
             newFile.close();
             
-            printf("File created successfully: %s\n", fullPath.c_str());
+            printf("File created successfully");
         }
         catch(const std::exception& e){
             std::cout << e.what() << std::endl;
