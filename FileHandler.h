@@ -23,8 +23,7 @@ namespace FileHandler{
 
 class FileHandler{
 public:
-    explicit FileHandler(std::fstream& fileStream);
-    FileHandler() = default;
+    FileHandler(std::fstream& fileStream);
     ~FileHandler();
     
     FileHandler(const FileHandler&) = delete;
@@ -32,7 +31,7 @@ public:
 
     std::string GetFileName() const;
     bool isFileOpen() const;
-    static bool FileHandler::ScanDirectoryForFile(std::string_view fileName, const std::string& directory);
+    static bool ScanDirectoryForFile(std::string_view fileName, const std::string& directory);
     bool CreateFile(const std::string& fileName);
     void CloseFile();
     void OpenFile(const std::string& filename, FileMode mode = FileMode::BINARY);
@@ -41,7 +40,7 @@ public:
 private:
     static bool MoveFile(std::string_view source, std::string_view destination);
     static bool DeleteFile(std::string_view fileName);
-    std::string_view GetSubdirectory();
+    std::string GetSubdirectory();
     std::filesystem::path GetUserDirectory(std::string_view subdirectory) const;
 
 protected:

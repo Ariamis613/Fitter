@@ -3,9 +3,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <sys/stat.h>
-
-
+#include <algorithm>
 
 namespace FileHandler{
     
@@ -103,10 +103,10 @@ namespace FileHandler{
         return std::filesystem::exists(fullPath) && std::filesystem::is_regular_file(fullPath);
     }
 
-    std::string_view GetSubdirectory(){
-
+    std::string FileHandler::GetSubdirectory(){
 
         std::string subdirectory{};
+        
         while(true){
             std::cout << "Enter the subdirectory name: (e.g 'Desktop')";
             std::getline(std::cin, subdirectory);
@@ -115,20 +115,18 @@ namespace FileHandler{
                 std::cerr << "Subdirectory name cannot be empty!" << std::endl;
                 continue;
             }
-
-            for(const auto& delim : directoryDelimiters){
-                if(subdirectory.find(delim) != std::string::npos){
-                    std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', '..' or ':'" << std::endl;
-                    continue;
-                }
+            if(std::any_of(directoryDelimiters.begin(), directoryDelimiters.end(), [&subdirectory](char delim) {return subdirectory.find(delim) != std::string::npos; })){
+                std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', '..', or ':'." << std::endl;
             }
-
+            // for(const auto& delim : directoryDelimiters){
+            //     if(subdirectory.find(delim) != std::string::npos){
+            //         std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', '..' or ':'" << std::endl;
+            //         continue;
+            //     }
+            // }
             break;
-
         }
-
         return subdirectory;
-
     }
 
     std::filesystem::path FileHandler::GetUserDirectory(std::string_view subdirectory) const{
@@ -145,7 +143,7 @@ namespace FileHandler{
             directory = std::filesystem::path(userProfile) / subdirectory;
             return directory;
         }
-        #else
+        #else // LINUX
         const char* userProfile = std::getenv("HOME");
         if(!userProfile){
             throw std::runtime_error("Failed to resolve user profile directory!");      
@@ -155,6 +153,7 @@ namespace FileHandler{
             return directory;
         }
         #endif
+        return directory;
     }
 
     bool FileHandler::CreateFile(const std::string& fileName){
@@ -206,6 +205,7 @@ namespace FileHandler{
         }
         catch(const std::exception& e){
             std::cout << e.what() << std::endl;
+            return false;
         }
     }
 } //namespace FileHandler
