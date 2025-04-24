@@ -157,9 +157,10 @@ namespace FileHandler{
     }
 
     bool FileHandler::CreateFile(const std::string& fileName){
+        
         CloseFile();
 
-        std::string_view userSubdirectory = GetSubdirectory();
+        const std::string userSubdirectory = GetSubdirectory();
         std::filesystem::path subdirectory = GetUserDirectory(userSubdirectory);
 
         try{

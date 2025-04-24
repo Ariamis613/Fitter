@@ -1,11 +1,11 @@
 #pragma once
 
 #include "App.h"
+
 #include <fstream>
 #include <string_view>
 #include <filesystem>
 #include <array>
-
 
 static constexpr std::array<char, 4> directoryDelimiters = {
     '\\', '/', ':', '|'
@@ -40,7 +40,7 @@ public:
 private:
     static bool MoveFile(std::string_view source, std::string_view destination);
     static bool DeleteFile(std::string_view fileName);
-    std::string GetSubdirectory();
+    static std::string GetSubdirectory();
     std::filesystem::path GetUserDirectory(std::string_view subdirectory) const;
 
 protected:
