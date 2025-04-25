@@ -9,10 +9,6 @@
 
 using FsPath = std::filesystem::path;
 
-static constexpr std::array<char, 4> directoryDelimiters = {
-    '\\', '/', ':', '|'
-};
-
 namespace FileHandler{
 
     enum class FileMode{
@@ -25,7 +21,8 @@ namespace FileHandler{
 
 class FileHandler{
 public:
-    FileHandler(std::fstream& fileStream);
+    FileHandler(std::fstream&& fileStream);
+    FileHandler(const std::string& fileName, FileMode mode = FileMode::READ);
     ~FileHandler();
     
     FileHandler(const FileHandler&) = delete;
@@ -34,7 +31,8 @@ public:
     // * Getters
     std::string GetFileName() const;
 
-    bool isFileOpen() const;
+    bool IsFileOpen() const;
+    bool IsFileEmpty();
     static bool ScanDirectoryForFile(std::string_view fileName, const std::string& directory);
     bool CreateFile(const std::string& fileName);
     void CloseFile();
@@ -48,9 +46,21 @@ protected:
     FsPath GetUserDirectory(std::string_view subdirectory) const;
 
 private:
-    static std::string m_fileName;
-    std::fstream& m_fileStream;
-    std::string m_lastError;
-    int* data = nullptr;
+    std::string m_fileName;
+    std::fstream m_fileStream;
 };
 } // namespace FileHandler
+
+namespace JSON{
+
+// TODO: Implement JSON support for FileHandling
+class JSON : public FileHandler::FileHandler{
+public:
+    JSON(const std::string& fileName, const std::string& fileExt = ".json");
+    ~JSON();
+
+private:
+
+};
+
+} // namespace CSV

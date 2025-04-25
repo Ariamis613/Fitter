@@ -1,17 +1,28 @@
 #include "FileHandler.h"
 
+#include <exception>
 #include <filesystem>
-#include <stdexcept>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <sys/stat.h>
 #include <algorithm>
 
-namespace FileHandler{
-    
-    FileHandler::FileHandler(std::fstream& fileStream) : m_fileStream(fileStream) {}
+static constexpr std::array<char, 4> directoryDelimiters = {
+    '\\', '/', ':', '|'
+};
 
+namespace FileHandler{
+
+    FileHandler::FileHandler(std::fstream&& fileStream) : m_fileStream(std::move(fileStream)) {}
+    FileHandler::FileHandler(const std::string& fileName, FileMode mode) : m_fileName(""){
+        try{
+            OpenFile(fileName, mode);
+        } catch(const std::ios_base::failure& e){
+            std::cerr << "Failed to open file. " << e.what() << std::endl;
+        }   
+    }
     FileHandler::~FileHandler(){
         CloseFile();
     }
@@ -26,8 +37,12 @@ namespace FileHandler{
         }
     }
 
-    bool FileHandler::isFileOpen() const{
+    bool FileHandler::IsFileOpen() const{
         return m_fileStream.is_open();
+    }
+
+    bool FileHandler::IsFileEmpty(){
+        return m_fileStream.peek() == std::fstream::traits_type::eof();
     }
 
     void FileHandler::OpenFile(const std::string& filename, FileMode mode){
@@ -48,11 +63,8 @@ namespace FileHandler{
             case FileMode::READ_WRITE:
                 openMode |= std::ios_base::in | std::ios_base::out;
                 break;
-            case FileMode::BINARY:
-                openMode |= std::ios_base::binary;
-                break;
             default:
-                throw std::ios_base::failure("Invalid file mode");
+                std::cerr << "Invalid file mode";
                 break;
             }
 
@@ -62,7 +74,8 @@ namespace FileHandler{
             m_fileName = filename;
         }
         else{
-            throw std::ios_base::failure("Failed to open file: " + filename);
+            std::cerr << "Failed to open file: " + filename;
+            std::cout << std::endl;
         }
     }
 
@@ -82,7 +95,7 @@ namespace FileHandler{
             return lines_v;
         }
         catch(const std::exception& e){
-            throw std::runtime_error(e.what());
+            std::cerr << e.what() << std::endl;
             return {};
         }
     }
@@ -92,12 +105,13 @@ namespace FileHandler{
         FsPath dirPath(directory);
 
         if(!std::filesystem::is_directory(directory)){
-            throw std::invalid_argument("Provided directory is invalid"); 
+            std::cerr << "Provided directory is invalid\n"; 
         }
         FsPath filePath(fileName);
         if(filePath.has_parent_path() || filePath.is_absolute()){
-            throw std::invalid_argument("Invalid file name");
+            std::cerr << "Invalid file name\n";
         }
+        std::cout << std::endl;
 
         const FsPath fullPath = dirPath / filePath;
 
@@ -124,7 +138,6 @@ namespace FileHandler{
         return subdirectory;
     }
 
-    // TODO: According to Claude 3.7 this function uses the subdirectory parameter ineffectively, fix it.
     FsPath FileHandler::GetUserDirectory(std::string_view subdirectory) const{
         //@NOTE (ari): TODO
         FsPath directory{};
@@ -133,13 +146,13 @@ namespace FileHandler{
             #ifdef _WIN32 // WINDOWS
             const char* homeDir = std::getenv("USERPROFILE");
             if(!userProfile){
-                throw std::runtime_error("Failed to resolve user profile directory!");
+                std::cerr << "Failed to resolve user profile directory!" << std::endl;
             }
             directory = homeDir;
             #else // LINUX/macOS
             const char* homeDir = std::getenv("HOME");
             if(!homeDir){
-                throw std::runtime_error("Failed to resolve user profile directory!");      
+                std::cerr << "Failed to resolve user profile directory!" << std::endl;      
             }
             directory = homeDir;
             #endif
@@ -165,7 +178,8 @@ namespace FileHandler{
             return targetDir;
         }
         catch(const std::exception& e){
-            throw std::runtime_error(e.what());
+            std::cerr << e.what() << std::endl;
+            return directory;
         }  
     }
 
@@ -178,7 +192,7 @@ namespace FileHandler{
 
         try{
             if(std::filesystem::exists(fileName)){
-                throw std::runtime_error("File already exists!");
+                std::cerr << "File already exists!" << std::endl;
             }
 
             #ifdef _WIN32
@@ -190,7 +204,7 @@ namespace FileHandler{
             std::ofstream newFile(fullPath);
 
             if(!newFile.is_open()){
-                throw std::runtime_error("Failed to create file: " + fullPath.string());
+                std::cerr << "Failed to create file: " + fullPath.string();
             }
 
             newFile.close();
