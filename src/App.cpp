@@ -4,11 +4,10 @@ extern "C"{
   #include <stdio.h>
   #include <assert.h>
 }
+
 #include <cstdlib>
-#include <exception>
 #include <iostream>
 #include <limits>
-#include <stdexcept>
 
 namespace Fitter{
 
@@ -16,7 +15,7 @@ namespace Fitter{
   Fitter::Fitter() = default;
   Fitter::~Fitter(){};
 
-
+  
   void Fitter::PrintExerciseObject(const Fitter& ex){
     
   }

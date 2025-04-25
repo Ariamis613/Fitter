@@ -5,7 +5,7 @@
 namespace Fitter{
 
 class Fitter{
-  public:
+public:
   Fitter(const std::string name, const int sets, const int reps, const float weight);
   Fitter();
   ~Fitter();
@@ -24,6 +24,7 @@ class Fitter{
   //@squeeze: TODO
 
   void Start();
+  void Delete(); // TODO: Implement
   void PrintExerciseObject(const Fitter& ex);
   void PrintExerciseVector(const std::vector<Fitter>& exercises);
   void ClearScreen() const;
@@ -31,7 +32,7 @@ class Fitter{
   Fitter DisplayMenu();
   friend std::ostream& operator<<(std::ostream& os, const Fitter& obj);
 
-  private:
+private:
   std::string m_name;
   int m_sets{0}; 
   int m_reps{0};

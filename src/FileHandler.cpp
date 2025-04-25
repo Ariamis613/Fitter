@@ -1,5 +1,6 @@
 #include "FileHandler.h"
 
+#include <filesystem>
 #include <stdexcept>
 #include <iostream>
 #include <string>
@@ -32,7 +33,7 @@ namespace FileHandler{
     void FileHandler::OpenFile(const std::string& filename, FileMode mode){
         CloseFile();
 
-        std::ios::openmode openMode;
+        std::ios::openmode openMode{};
 
         switch(mode){
             case FileMode::READ:
@@ -53,7 +54,7 @@ namespace FileHandler{
             default:
                 throw std::ios_base::failure("Invalid file mode");
                 break;
-        }
+            }
 
         m_fileStream.open(filename, openMode);
         
@@ -81,24 +82,24 @@ namespace FileHandler{
             return lines_v;
         }
         catch(const std::exception& e){
-            std::cout << e.what() << std::endl;
-            return lines_v;
+            throw std::runtime_error(e.what());
+            return {};
         }
     }
 
     bool FileHandler::ScanDirectoryForFile(std::string_view fileName, const std::string& directory){
 
-        std::filesystem::path dirPath(directory);
+        FsPath dirPath(directory);
 
         if(!std::filesystem::is_directory(directory)){
             throw std::invalid_argument("Provided directory is invalid"); 
         }
-        std::filesystem::path filePath(fileName);
+        FsPath filePath(fileName);
         if(filePath.has_parent_path() || filePath.is_absolute()){
             throw std::invalid_argument("Invalid file name");
         }
 
-        const std::filesystem::path fullPath = dirPath / filePath;
+        const FsPath fullPath = dirPath / filePath;
 
         return std::filesystem::exists(fullPath) && std::filesystem::is_regular_file(fullPath);
     }
@@ -118,42 +119,54 @@ namespace FileHandler{
             if(std::any_of(directoryDelimiters.begin(), directoryDelimiters.end(), [&subdirectory](char delim) {return subdirectory.find(delim) != std::string::npos; })){
                 std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', '..', or ':'." << std::endl;
             }
-            // for(const auto& delim : directoryDelimiters){
-            //     if(subdirectory.find(delim) != std::string::npos){
-            //         std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', '..' or ':'" << std::endl;
-            //         continue;
-            //     }
-            // }
             break;
         }
         return subdirectory;
     }
 
-    std::filesystem::path FileHandler::GetUserDirectory(std::string_view subdirectory) const{
-        //@NOTE: TODO
-        std::filesystem::path directory{};
-        std::string_view defaultDir = "Documents";
+    // TODO: According to Claude 3.7 this function uses the subdirectory parameter ineffectively, fix it.
+    FsPath FileHandler::GetUserDirectory(std::string_view subdirectory) const{
+        //@NOTE (ari): TODO
+        FsPath directory{};
 
-        #ifdef _WIN32
-        const char* userProfile = std::getenv("USERPROFILE");
-        if(!userProfile){
-            throw std::runtime_error("Failed to resolve user profile directory!");
+        try{
+            #ifdef _WIN32 // WINDOWS
+            const char* homeDir = std::getenv("USERPROFILE");
+            if(!userProfile){
+                throw std::runtime_error("Failed to resolve user profile directory!");
+            }
+            directory = homeDir;
+            #else // LINUX/macOS
+            const char* homeDir = std::getenv("HOME");
+            if(!homeDir){
+                throw std::runtime_error("Failed to resolve user profile directory!");      
+            }
+            directory = homeDir;
+            #endif
+
+            FsPath targetDir = directory / subdirectory;
+
+            if(!std::filesystem::exists(targetDir)){
+                try{
+                    std::filesystem::create_directory(targetDir);
+                    std::cout << "Created directory: " << targetDir << std::endl;
+                } catch (const std::filesystem::filesystem_error& e){
+                    std::cerr << "Failed to create directory " << e.what() << '\n';
+                    std::cout << "Going back to default directory: 'Documents'... " << std::endl;
+
+                    FsPath docsDir = directory / "Documents";
+                    if(std::filesystem::exists(docsDir)){
+                        return docsDir;
+                        std::cout << "Default directory set: 'Documents'" << std::endl;
+                    }
+                    return directory;
+                }
+            }
+            return targetDir;
         }
-        if(!std::filesystem::exists(defaultDir)){
-            directory = std::filesystem::path(userProfile) / subdirectory;
-            return directory;
-        }
-        #else // LINUX
-        const char* userProfile = std::getenv("HOME");
-        if(!userProfile){
-            throw std::runtime_error("Failed to resolve user profile directory!");      
-        }
-        if(!std::filesystem::exists(defaultDir)){
-            directory = std::filesystem::path(userProfile) / subdirectory;
-            return directory;
-        }
-        #endif
-        return directory;
+        catch(const std::exception& e){
+            throw std::runtime_error(e.what());
+        }  
     }
 
     bool FileHandler::CreateFile(const std::string& fileName){
@@ -161,7 +174,7 @@ namespace FileHandler{
         CloseFile();
 
         const std::string userSubdirectory = GetSubdirectory();
-        std::filesystem::path subdirectory = GetUserDirectory(userSubdirectory);
+        FsPath subdirectory = GetUserDirectory(userSubdirectory);
 
         try{
             if(std::filesystem::exists(fileName)){
@@ -169,9 +182,9 @@ namespace FileHandler{
             }
 
             #ifdef _WIN32
-            const std::filesystem::path fullPath = subdirectory / fileName;
+            const FsPath fullPath = subdirectory / fileName;
             #else
-            const std::filesystem::path fullPath = subdirectory / fileName;
+            const FsPath fullPath = subdirectory / fileName;
             #endif
 
             std::ofstream newFile(fullPath);
@@ -179,6 +192,8 @@ namespace FileHandler{
             if(!newFile.is_open()){
                 throw std::runtime_error("Failed to create file: " + fullPath.string());
             }
+
+            newFile.close();
             
             std::cout << "File created successfully!: " << fullPath << std::endl;
             return true;
