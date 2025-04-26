@@ -7,17 +7,17 @@
 #include <filesystem>
 #include <array>
 
-using FsPath = std::filesystem::path;
+enum class FileMode{
+    READ,
+    WRITE,
+    APPEND,
+    READ_WRITE,
+    BINARY,
+};
 
 namespace FileHandler{
 
-    enum class FileMode{
-        READ,
-        WRITE,
-        APPEND,
-        READ_WRITE,
-        BINARY,
-    };
+using FsPath = std::filesystem::path;
 
 class FileHandler{
 public:
@@ -50,17 +50,3 @@ private:
     std::fstream m_fileStream;
 };
 } // namespace FileHandler
-
-namespace JSON{
-
-// TODO: Implement JSON support for FileHandling
-class JSON : public FileHandler::FileHandler{
-public:
-    JSON(const std::string& fileName, const std::string& fileExt = ".json");
-    ~JSON();
-
-private:
-
-};
-
-} // namespace CSV
