@@ -1,4 +1,5 @@
 #include "App.h"
+#include "FileHandler.h"
 
 extern "C"{
   #include <stdio.h>
@@ -11,20 +12,19 @@ extern "C"{
 
 namespace Fitter{
 
-  Fitter::Fitter(const std::string name, const int sets, const int reps, const float weight) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight){}
-  Fitter::Fitter() = default;
-  Fitter::~Fitter(){};
+  Fitter::Fitter(const std::string name, const int sets, const int reps, const float weight) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight){
 
-  
-  void Fitter::PrintExerciseObject(const Fitter& ex){
-    
+  }
+  Fitter::Fitter() = default;
+  Fitter::~Fitter(){
+   ClearScreen();
   }
 
   void Fitter::PrintExerciseVector(const std::vector<Fitter>& exercises) {
     std::cout << "Exercise History (" << exercises.size() << " entries):" << std::endl;
     std::cout << "----------------------------------------" << std::endl;
     
-    for (size_t i = 0; i < exercises.size(); i++) {
+    for(size_t i = 0; i < exercises.size(); i++) {
       std::cout << "Entry #" << (i+1) << ": ";
       PrintExerciseObject(exercises[i]);
     }
@@ -33,12 +33,14 @@ namespace Fitter{
   }
 
   std::vector<Fitter> Fitter::LogExercise(const Fitter& exercise){
-   // if(!IsAppRunning()){
-   //   return {};  
-   // }
-   exerciseBuffer.emplace_back(exercise);
-
-   return exerciseBuffer;
+    try{
+      exerciseBuffer.emplace_back(exercise);
+      return exerciseBuffer;
+    }
+    catch(std::exception& e){
+      std::cerr << e.what() << std::endl;
+      return {};
+    }
   }
 
   std::ostream& operator<<(std::ostream& os, const Fitter& obj) {
@@ -52,7 +54,7 @@ namespace Fitter{
     isRunning = true;
   }
   
-  void Fitter::ClearScreen() const{
+  void Fitter::ClearScreen(){
     #ifdef _WIN32
       system("cls");
     #else
@@ -82,14 +84,23 @@ namespace Fitter{
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     
     return Fitter(name, reps, sets, weight);
+
+    ClearScreen();
   }
-  
+
+  // HERE
   void Fitter::Update(){
     while(IsAppRunning()){
-    
+      FileHandler_ptr = std::make_unique<FileHandler::FileHandler>();
+      
+      if(FileHandler_ptr->GetChoice() == 1)
+
+
     }
   }
 
+  void Fitter::Delete(){
 
+  }
 
 }//namespace Fitter

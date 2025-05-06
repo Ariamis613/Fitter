@@ -1,4 +1,5 @@
 #include "FileHandler.h"
+#include "App.h"
 
 #include <exception>
 #include <filesystem>
@@ -15,14 +16,20 @@ static constexpr std::array<char, 4> directoryDelimiters = {
 
 namespace FileHandler{
 
-    FileHandler::FileHandler(std::fstream&& fileStream) : m_fileStream(std::move(fileStream)) {}
+    FileHandler::FileHandler(std::fstream&& fileStream) : m_fileStream(std::move(fileStream)) {
+    }
+
     FileHandler::FileHandler(const std::string& fileName, FileMode mode) : m_fileName(""){
         try{
             OpenFile(fileName, mode);
+            m_isOpen = true;
         } catch(const std::ios_base::failure& e){
             std::cerr << "Failed to open file. " << e.what() << std::endl;
         }   
     }
+
+    FileHandler::FileHandler() = default;
+
     FileHandler::~FileHandler(){
         CloseFile();
     }
@@ -38,11 +45,28 @@ namespace FileHandler{
     }
 
     bool FileHandler::IsFileOpen() const{
-        return m_fileStream.is_open();
+        return m_isOpen;
     }
 
     bool FileHandler::IsFileEmpty(){
         return m_fileStream.peek() == std::fstream::traits_type::eof();
+    }
+
+    int FileHandler::GetChoice() const{
+        return m_choice;
+    }
+
+    int FileHandler::DisplayChoice(){
+        std::cout << "Please select an option: \n"; 
+        std::cout << "1. Create a new file.\n";
+        std::cout << "2. Save to file.\n";
+        std::cout << "3. Read from file.\n";
+        std::cout << std::endl;
+
+        std::cin >> m_choice;
+        Fitter::Fitter::ClearScreen();
+
+        return m_choice > 0 && m_choice <= 3 ? m_choice : throw std::invalid_argument("Number should be between 1-3!\n");
     }
 
     void FileHandler::OpenFile(const std::string& filename, FileMode mode){
@@ -139,7 +163,7 @@ namespace FileHandler{
     }
 
     FsPath FileHandler::GetUserDirectory(std::string_view subdirectory) const{
-        //@NOTE (ari): TODO
+   
         FsPath directory{};
 
         try{
@@ -163,7 +187,8 @@ namespace FileHandler{
                 try{
                     std::filesystem::create_directory(targetDir);
                     std::cout << "Created directory: " << targetDir << std::endl;
-                } catch (const std::filesystem::filesystem_error& e){
+                } 
+                catch (const std::filesystem::filesystem_error& e){
                     std::cerr << "Failed to create directory " << e.what() << '\n';
                     std::cout << "Going back to default directory: 'Documents'... " << std::endl;
 
@@ -184,7 +209,6 @@ namespace FileHandler{
     }
 
     bool FileHandler::CreateFile(const std::string& fileName){
-        
         CloseFile();
 
         const std::string userSubdirectory = GetSubdirectory();
@@ -218,7 +242,7 @@ namespace FileHandler{
         }
     }
 
-     bool FileHandler::MoveFile(std::string_view source, std::string_view destination){
+    bool FileHandler::MoveFile(std::string_view source, std::string_view destination){
         try{
             std::filesystem::rename(source, destination);
             return true;

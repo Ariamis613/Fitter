@@ -1,36 +1,22 @@
 #include "src/App.h"
 
-#include <iostream>
 #include <cassert>
+#include <memory>
 
-// Test function to validate Fitter class behavior
-void testFitter() {
-    // Create an instance of Fitter
-    Fitter::Fitter fitter;
-    
-    // Test DisplayMenu functionality
-    std::cout << "Testing DisplayMenu function..." << std::endl;
-    Fitter::Fitter menuResult = fitter.Fitter::Fitter::DisplayMenu();
-    
-    std::vector<Fitter::Fitter> exercises = fitter.LogExercise(menuResult);
-    assert(!exercises.empty() && "Exercise buffer should not be empty after logging an exercise.");
+ int main(){
+    Fitter::Fitter App;
 
-    std::cout << "\nTesting LogExercise vector..." << std::endl;
-    fitter.PrintExerciseVector(exercises);
-    // Test the overloaded insertion operator
-    std::cout << "\nTesting operator<< overload..." << std::endl;
-    // Add more specific tests based on expected behavior
-    std::cout << "\nAll tests completed.\n" << std::endl;
-}
+    std::unique_ptr<FileHandler::FileHandler> FileHandler = 
+    std::make_unique<FileHandler::FileHandler>();
 
-int main() {
-    try {
-        testFitter();
-        std::cout << "All tests passed successfully!" << std::endl;
-    } catch (const std::exception& e) {
-        std::cerr << "Test failed with exception: " << e.what() << std::endl;
-        return 1;
+    App.Start();
+
+    App.DisplayMenu();
+
+    while(App.IsAppRunning()){
+        App.Update();
+        
     }
-    
+
     return 0;
-}
+ }
