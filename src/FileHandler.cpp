@@ -34,6 +34,15 @@ namespace FileHandler{
         CloseFile();
     }
 
+  
+    void FileHandler::ClearScreen(){
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+    }
+
     std::string FileHandler::GetFileName() const{
         return m_fileName;
     }
@@ -64,12 +73,13 @@ namespace FileHandler{
         std::cout << std::endl;
 
         std::cin >> m_choice;
-        Fitter::Fitter::ClearScreen();
+
+        ClearScreen();
 
         return m_choice > 0 && m_choice <= 3 ? m_choice : throw std::invalid_argument("Number should be between 1-3!\n");
     }
 
-    void FileHandler::OpenFile(const std::string& filename, FileMode mode){
+    void FileHandler::OpenFile(const std::string& fileName, FileMode mode){
         CloseFile();
 
         std::ios::openmode openMode{};
@@ -92,13 +102,13 @@ namespace FileHandler{
                 break;
             }
 
-        m_fileStream.open(filename, openMode);
+        m_fileStream.open(fileName, openMode);
         
         if(m_fileStream.is_open()){
-            m_fileName = filename;
+            m_fileName = fileName;
         }
         else{
-            std::cerr << "Failed to open file: " + filename;
+            std::cerr << "Failed to open file: " + fileName;
             std::cout << std::endl;
         }
     }
@@ -124,6 +134,8 @@ namespace FileHandler{
         }
     }
 
+
+    // * @NOTE: Checks if the file exists in the directory //
     bool FileHandler::ScanDirectoryForFile(std::string_view fileName, const std::string& directory){
 
         FsPath dirPath(directory);
@@ -142,6 +154,7 @@ namespace FileHandler{
         return std::filesystem::exists(fullPath) && std::filesystem::is_regular_file(fullPath);
     }
 
+    // * @NOTE: Gets the subdirectory name from the user //
     std::string FileHandler::GetSubdirectory(){
 
         std::string subdirectory{};
@@ -160,6 +173,16 @@ namespace FileHandler{
             break;
         }
         return subdirectory;
+    }
+
+    bool FileHandler::SaveToFile(Fitter::Fitter* object, std::string_view fileName){
+        if(object == nullptr || fileName.empty()){
+            std::cerr << "Cannot initialize object or file! " << std::endl;
+            return false;
+        }
+        // HERE
+        m_fileStream.
+
     }
 
     FsPath FileHandler::GetUserDirectory(std::string_view subdirectory) const{
@@ -261,5 +284,46 @@ namespace FileHandler{
             std::cout << e.what() << std::endl;
             return false;
         }
+    }
+
+    bool FileHandler::IsValidFileName(const std::string& fileName) const{
+        if(fileName.empty()){
+            std::cerr << "File name cannot be empty!" << std::endl;
+            return false;
+        }
+
+        static constexpr std::array<std::string_view, 10> invalidChars = {
+            "\\", "/", ":", "*", "?", "\"", "<", ">", "|", "|"
+        };
+
+        for(const auto& invalid : invalidChars){
+            if(fileName.find(invalid) != std::string::npos){
+                std::cerr << "File name contains invalid characters!" << std::endl;
+                return false;
+            }
+        }
+
+        if (fileName.front() == ' ' || fileName.back() == ' ' ||
+        fileName.front() == '.' || fileName.back() == '.'){
+            return false;
+        }
+
+        return true;
+        
+    }
+
+    // Gets and sets the file name based on user input
+    std::string FileHandler::SetFileName(){
+        std::string fileName{};
+
+        std::getline(std::cin, fileName);
+        m_fileName = fileName;
+
+        if(!IsValidFileName(m_fileName)){
+            std::cerr << "Filename is invalid!" << std::endl;
+            return "";
+        }
+
+        return m_fileName;
     }
 } //namespace FileHandler

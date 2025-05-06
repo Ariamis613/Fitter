@@ -53,14 +53,7 @@ namespace Fitter{
     printf("Welcome to Fitter!");
     isRunning = true;
   }
-  
-  void Fitter::ClearScreen(){
-    #ifdef _WIN32
-      system("cls");
-    #else
-      system("clear");
-    #endif
-  }
+
 
   Fitter Fitter::DisplayMenu(){
 
@@ -92,9 +85,20 @@ namespace Fitter{
   void Fitter::Update(){
     while(IsAppRunning()){
       FileHandler_ptr = std::make_unique<FileHandler::FileHandler>();
-      
-      if(FileHandler_ptr->GetChoice() == 1)
 
+      FileHandler_ptr->DisplayChoice();
+      FileHandler_ptr->SetFileName();
+
+      const std::string& fileName = FileHandler_ptr->GetFileName();
+      
+      if(FileHandler_ptr->GetChoice() == 1){
+        printf("Creating file: %s\n", fileName.c_str());
+        FileHandler_ptr->CreateFile(fileName);
+        printf("File %s created successfully!\n", fileName.c_str());
+      }
+      else if(FileHandler_ptr->GetChoice() == 2){
+
+      }
 
     }
   }

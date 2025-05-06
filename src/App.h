@@ -2,8 +2,13 @@
 
 #include <string>
 #include <vector>
-#include "FileHandler.h"
 #include <memory>
+#include <cstdint>
+
+// forward declaration
+namespace FileHandler{
+  class FileHandler;
+}
 
 namespace Fitter{
 
@@ -35,7 +40,7 @@ public:
   uint8_t choice = 0;
 
 private:
-  static std::unique_ptr<FileHandler::FileHandler> FileHandler_ptr;
+  std::unique_ptr<FileHandler::FileHandler> FileHandler_ptr;
   std::string m_name;
   int m_sets{0};
   int m_reps{0};

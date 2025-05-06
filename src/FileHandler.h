@@ -14,6 +14,10 @@ enum class FileMode{
     BINARY,
 };
 
+namespace Fitter{
+    class Fitter;
+}
+
 namespace FileHandler{
 
 using FsPath = std::filesystem::path;
@@ -40,9 +44,12 @@ public:
     void CloseFile();
     int DisplayChoice();
     int GetChoice() const;
-    void OpenFile(const std::string& filename, FileMode mode = FileMode::BINARY);
+    void OpenFile(const std::string& fileName, FileMode mode = FileMode::BINARY);
     std::vector<std::string> ReadFile(const std::string& file);
-    
+    std::string SetFileName();
+    bool IsValidFileName(const std::string& fileName) const;
+    bool SaveToFile(Fitter::Fitter* object, std::string_view fileName);
+
 protected:
     static bool ScanDirectoryForFile(std::string_view fileName, const std::string& directory);
     static bool MoveFile(std::string_view source, std::string_view destination);
