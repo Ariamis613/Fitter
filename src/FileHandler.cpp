@@ -1,18 +1,15 @@
 #include "FileHandler.h"
 #include "App.h"
+#include "Utils.h"
+
 
 #include <exception>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <sys/stat.h>
 #include <algorithm>
-
-static constexpr std::array<char, 4> directoryDelimiters = {
-    '\\', '/', ':', '|'
-};
 
 namespace FileHandler{
 
@@ -33,8 +30,7 @@ namespace FileHandler{
     FileHandler::~FileHandler(){
         CloseFile();
     }
-
-  
+ 
     void FileHandler::ClearScreen(){
         #ifdef _WIN32
             system("cls");
@@ -79,7 +75,7 @@ namespace FileHandler{
         return m_choice > 0 && m_choice <= 3 ? m_choice : throw std::invalid_argument("Number should be between 1-3!\n");
     }
 
-    void FileHandler::OpenFile(const std::string& fileName, FileMode mode){
+    void FileHandler::OpenFile(const std::string& fileName, const FileMode mode){
         CloseFile();
 
         std::ios::openmode openMode{};
@@ -134,108 +130,21 @@ namespace FileHandler{
         }
     }
 
-
-    // * @NOTE: Checks if the file exists in the directory //
-    bool FileHandler::ScanDirectoryForFile(std::string_view fileName, const std::string& directory){
-
-        FsPath dirPath(directory);
-
-        if(!std::filesystem::is_directory(directory)){
-            std::cerr << "Provided directory is invalid\n"; 
-        }
-        FsPath filePath(fileName);
-        if(filePath.has_parent_path() || filePath.is_absolute()){
-            std::cerr << "Invalid file name\n";
-        }
-        std::cout << std::endl;
-
-        const FsPath fullPath = dirPath / filePath;
-
-        return std::filesystem::exists(fullPath) && std::filesystem::is_regular_file(fullPath);
-    }
-
-    // * @NOTE: Gets the subdirectory name from the user //
-    std::string FileHandler::GetSubdirectory(){
-
-        std::string subdirectory{};
-        
-        while(true){
-            std::cout << "Enter the subdirectory name: (e.g 'Desktop')";
-            std::getline(std::cin, subdirectory);
-
-            if(subdirectory.empty()){
-                std::cerr << "Subdirectory name cannot be empty!" << std::endl;
-                continue;
-            }
-            if(std::any_of(directoryDelimiters.begin(), directoryDelimiters.end(), [&subdirectory](char delim) {return subdirectory.find(delim) != std::string::npos; })){
-                std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', '..', or ':'." << std::endl;
-            }
-            break;
-        }
-        return subdirectory;
-    }
-
     bool FileHandler::SaveToFile(Fitter::Fitter* object, std::string_view fileName){
         if(object == nullptr || fileName.empty()){
             std::cerr << "Cannot initialize object or file! " << std::endl;
             return false;
         }
         // HERE
-        m_fileStream.
+        // m_fileStream.
 
-    }
-
-    FsPath FileHandler::GetUserDirectory(std::string_view subdirectory) const{
-   
-        FsPath directory{};
-
-        try{
-            #ifdef _WIN32 // WINDOWS
-            const char* homeDir = std::getenv("USERPROFILE");
-            if(!userProfile){
-                std::cerr << "Failed to resolve user profile directory!" << std::endl;
-            }
-            directory = homeDir;
-            #else // LINUX/macOS
-            const char* homeDir = std::getenv("HOME");
-            if(!homeDir){
-                std::cerr << "Failed to resolve user profile directory!" << std::endl;      
-            }
-            directory = homeDir;
-            #endif
-
-            FsPath targetDir = directory / subdirectory;
-
-            if(!std::filesystem::exists(targetDir)){
-                try{
-                    std::filesystem::create_directory(targetDir);
-                    std::cout << "Created directory: " << targetDir << std::endl;
-                } 
-                catch (const std::filesystem::filesystem_error& e){
-                    std::cerr << "Failed to create directory " << e.what() << '\n';
-                    std::cout << "Going back to default directory: 'Documents'... " << std::endl;
-
-                    FsPath docsDir = directory / "Documents";
-                    if(std::filesystem::exists(docsDir)){
-                        return docsDir;
-                        std::cout << "Default directory set: 'Documents'" << std::endl;
-                    }
-                    return directory;
-                }
-            }
-            return targetDir;
-        }
-        catch(const std::exception& e){
-            std::cerr << e.what() << std::endl;
-            return directory;
-        }  
     }
 
     bool FileHandler::CreateFile(const std::string& fileName){
         CloseFile();
 
-        const std::string userSubdirectory = GetSubdirectory();
-        FsPath subdirectory = GetUserDirectory(userSubdirectory);
+        const std::string userSubdirectory = utils::GetSubdirectory();
+        FsPath subdirectory = utils::GetUserDirectory(userSubdirectory);
 
         try{
             if(std::filesystem::exists(fileName)){
@@ -265,35 +174,14 @@ namespace FileHandler{
         }
     }
 
-    bool FileHandler::MoveFile(std::string_view source, std::string_view destination){
-        try{
-            std::filesystem::rename(source, destination);
-            return true;
-        }
-        catch(const std::exception& e){
-            std::cout << e.what() << std::endl;
-            return false;
-        }
-    }
-
-    bool FileHandler::DeleteFile(std::string_view fileName){
-        try{
-            return std::filesystem::remove(fileName);
-        }
-        catch(const std::exception& e){
-            std::cout << e.what() << std::endl;
-            return false;
-        }
-    }
-
     bool FileHandler::IsValidFileName(const std::string& fileName) const{
         if(fileName.empty()){
             std::cerr << "File name cannot be empty!" << std::endl;
             return false;
         }
 
-        static constexpr std::array<std::string_view, 10> invalidChars = {
-            "\\", "/", ":", "*", "?", "\"", "<", ">", "|", "|"
+        static constexpr std::array<char, 9> invalidChars = {
+            '\\', '/', ':', '*', '?', '\"', '<', '>', '|'
         };
 
         for(const auto& invalid : invalidChars){
@@ -307,9 +195,7 @@ namespace FileHandler{
         fileName.front() == '.' || fileName.back() == '.'){
             return false;
         }
-
         return true;
-        
     }
 
     // Gets and sets the file name based on user input

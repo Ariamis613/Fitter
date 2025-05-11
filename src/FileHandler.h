@@ -49,13 +49,7 @@ public:
     std::string SetFileName();
     bool IsValidFileName(const std::string& fileName) const;
     bool SaveToFile(Fitter::Fitter* object, std::string_view fileName);
-
-protected:
-    static bool ScanDirectoryForFile(std::string_view fileName, const std::string& directory);
-    static bool MoveFile(std::string_view source, std::string_view destination);
-    static bool DeleteFile(std::string_view fileName);
-    static std::string GetSubdirectory();
-    FsPath GetUserDirectory(std::string_view subdirectory) const;
+    void ClearScreen();
 
 private:
     std::string m_fileName;
