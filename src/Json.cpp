@@ -1,16 +1,16 @@
-#include "Json.h"
+// #include "Json.h"
 
-// TODO: Implement later
+// // TODO: Implement later
 
-namespace JSON{
+// namespace JSON{
 
-    JSON::JSON() : data(nlohmann::json::object()){}
+//     JSON::JSON() : data(nlohmann::json::object()){}
 
-    JSON::JSON(const std::string file) : m_file(file){}
+//     JSON::JSON(const std::string file) : m_file(file){}
 
-    JSON::JSON(const nlohmann::json& json) : data(json){}
+//     JSON::JSON(const nlohmann::json& json) : data(json){}
 
-    //JSON::~JSON();
+//     //JSON::~JSON();
     
 
-} // namespace JSON
+// } // namespace JSON

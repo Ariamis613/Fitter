@@ -49,12 +49,12 @@ public:
     std::string SetFileName();
     bool IsValidFileName(const std::string& fileName) const;
     bool SaveToFile(Fitter::Fitter* object, std::string_view fileName);
-    void ClearScreen();
+    static void ClearScreen();
 
 private:
     std::string m_fileName;
     std::fstream m_fileStream;
     bool m_isOpen = false;
-    static unsigned int m_choice;    
+    unsigned int m_choice;    
 };
 } // namespace FileHandler

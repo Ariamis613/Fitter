@@ -3,6 +3,7 @@
 #include <string>
 #include <filesystem>
 #include <stdexcept>
+#include <type_traits>
 
 using FsPath = std::filesystem::path;
 
@@ -12,4 +13,14 @@ namespace utils{
     bool DeleteFile(std::string_view fileName);
     std::string GetSubdirectory();
     FsPath GetUserDirectory(std::string_view subdirectory);
+
+    template<typename T>
+    double ConvertToKg(T lbsValue){
+        return lbsValue * 0.45359237;
+    }
+
+    template<typename T>
+    double ConvertToLbs(T kgValue){
+        return kgValue * 2.20462262;
+    }
 } // namespace utils

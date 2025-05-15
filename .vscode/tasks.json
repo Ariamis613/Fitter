@@ -1,22 +1,26 @@
 {
+  "version": "2.0.0",
   "tasks": [
       {
+          "label": "build",
           "type": "shell",
-          "label": "g++ build active file",
-          "command": "/usr/bin/g++",
+          "command": "g++",
           "args": [
+              "-std=c++17",
               "-g",
-              "-Wall",
-              "-std=c++23",
-              "${file}",
+              "${workspaceFolder}/main.cpp",
+              "${workspaceFolder}/src/*.cpp",
               "-o",
-              "${fileDirname}/${fileBasenameNoExtension}"
+              "${workspaceFolder}/bin/fitter"
           ],
-          "options": {
-              // "cwd": "/usr/bin"
-              "cwd": "${workspaceFolder}"
-          }
+          "group": {
+              "kind": "build",
+              "isDefault": true
+          },
+          "presentation": {
+              "reveal": "always"
+          },
+          "problemMatcher": "$gcc"
       }
-  ],
-  "version": "2.0.0"
+  ]
 }

@@ -52,7 +52,7 @@ std::string GetSubdirectory() {
   std::string subdirectory{};
 
   while (true) {
-    std::cout << "Enter the subdirectory name: (e.g 'Desktop')";
+    std::cout << "Enter the subdirectory name (e.g 'Desktop'): ";
     std::getline(std::cin, subdirectory);
 
     if (subdirectory.empty()) {

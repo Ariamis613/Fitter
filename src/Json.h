@@ -1,27 +1,27 @@
-#pragma once
+// #pragma once
 
-#include "nlohmann/json.hpp"
-#include "FileHandler.h"
+// #include "nlohmann/json.hpp"
+// #include "FileHandler.h"
 
-namespace JSON {
+// namespace JSON {
 
-class JSON : public FileHandler::FileHandler{
-public:
+// class JSON : public FileHandler::FileHandler{
+// public:
 
-    JSON();
+//     JSON();
 
-    JSON(const std::string file);
+//     JSON(const std::string file);
 
-    JSON(const nlohmann::json& json);
+//     JSON(const nlohmann::json& json);
 
-    ~JSON();
+//     ~JSON();
 
-    JSON& Parse() const{
+//     JSON& Parse() const{
 
-    }
+//     }
 
-private:
-    std::string m_file;
-    nlohmann::json data;
-};
-} // namespace JSON
+// private:
+//     std::string m_file;
+//     nlohmann::json data;
+// };
+// } // namespace JSON

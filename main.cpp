@@ -9,9 +9,9 @@
 
     App.DisplayMenu();
 
-    while(App.IsAppRunning()){
+
+    while(App.isRunning){
         App.Update();
-        
     }
 
     return 0;

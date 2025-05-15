@@ -9,7 +9,6 @@
 #include <string>
 #include <string_view>
 #include <sys/stat.h>
-#include <algorithm>
 
 namespace FileHandler{
 
@@ -131,20 +130,48 @@ namespace FileHandler{
     }
 
     bool FileHandler::SaveToFile(Fitter::Fitter* object, std::string_view fileName){
-        if(object == nullptr || fileName.empty()){
-            std::cerr << "Cannot initialize object or file! " << std::endl;
+        if(object == nullptr){
+            std::cerr << "Cannot save null object!" << std::endl;
             return false;
         }
-        // HERE
-        // m_fileStream.
 
+        // Use provided fileName or fall back to m_fileName if available
+        auto targetFile = fileName.empty() ? m_fileName : std::string(fileName);
+        
+        if(targetFile.empty()){
+            std::cerr << "No filename specified!" << std::endl;
+            return false;
+        }
+
+        try{
+            std::ofstream outFile(targetFile);
+            if(!outFile.is_open()){
+                std::cerr << "Failed to open file: " << targetFile << std::endl;
+                return false;
+            }
+
+            outFile << *object;
+            outFile << std::endl;
+            outFile.close();
+
+            // Update m_fileName if we used a new filename
+            if(!fileName.empty() && m_fileName != targetFile){
+                m_fileName = targetFile;
+            }
+
+            std::cout << "File saved successfully to: " << m_fileName << std::endl;
+            return true;
+        } catch(const std::exception& e){
+            std::cerr << "Error saving file: " << e.what() << std::endl;
+            return false;
+        }
     }
 
     bool FileHandler::CreateFile(const std::string& fileName){
         CloseFile();
 
-        const std::string userSubdirectory = utils::GetSubdirectory();
-        FsPath subdirectory = utils::GetUserDirectory(userSubdirectory);
+        const auto userSubdirectory = utils::GetSubdirectory();
+        auto subdirectory = utils::GetUserDirectory(userSubdirectory);
 
         try{
             if(std::filesystem::exists(fileName)){
@@ -152,9 +179,9 @@ namespace FileHandler{
             }
 
             #ifdef _WIN32
-            const FsPath fullPath = subdirectory / fileName;
+            const auto fullPath = subdirectory / fileName;
             #else
-            const FsPath fullPath = subdirectory / fileName;
+            const auto fullPath = subdirectory / fileName;
             #endif
 
             std::ofstream newFile(fullPath);
@@ -190,7 +217,6 @@ namespace FileHandler{
                 return false;
             }
         }
-
         if (fileName.front() == ' ' || fileName.back() == ' ' ||
         fileName.front() == '.' || fileName.back() == '.'){
             return false;
@@ -209,7 +235,6 @@ namespace FileHandler{
             std::cerr << "Filename is invalid!" << std::endl;
             return "";
         }
-
         return m_fileName;
     }
 } //namespace FileHandler
