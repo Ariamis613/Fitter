@@ -19,7 +19,7 @@ namespace Fitter{
   Fitter::~Fitter(){
     // Clean up resources if necessary
     exerciseBuffer.clear(); // Clear the exercise buffer
-    fHandler.reset(); // Reset the shared pointer to release the FileHandler object
+    pFileHandler.reset(); // Reset the shared pointer to release the FileHandler object
   }
 
   // void Fitter::PrintExerciseVector(const std::vector<Fitter>& exercises) {
@@ -47,7 +47,7 @@ namespace Fitter{
 
   std::ostream& operator<<(std::ostream& os, const Fitter& obj) {
     os << "Name: " << obj.m_name << ", Sets: " << obj.m_sets << ", Reps: " << obj.m_reps
-       << ", Weight: " << obj.m_weight_kg << "kg, lbs: " << utils::ConvertToLbs(obj.m_weight_kg) <<
+       << ", Weight: " << obj.m_weight_kg << "kg, lbs: " << Utils::ConvertToLbs(obj.m_weight_kg) <<
                                      ", Time: " << std::asctime(std::localtime(&obj.m_time));
     return os;
   }
@@ -65,17 +65,17 @@ namespace Fitter{
     unsigned int sets{0};
     float weight{0.00f};
 
-    printf("Enter exercise name: ");
+    std::cout << "Enter exercise name: ";
     std::getline(std::cin, name);
 
-    printf("Enter number of reps: ");
-    scanf("%d", &reps);
+    std::cout << "Enter number of reps: ";
+    std::cin >> reps;
 
-    printf("Enter number of sets: ");
-    scanf("%d", &sets);
+    std::cout << "Enter number of sets: ";
+    std::cin >> sets;
 
-    printf("Enter weight in kg: ");
-    scanf("%f", &weight);
+    std::cout << "Enter weight in kg: ";
+    std::cin >> weight;
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     
@@ -87,30 +87,62 @@ namespace Fitter{
   // HERE
   void Fitter::Update(){
     while(isRunning){
-      fHandler = std::make_shared<FileHandler::FileHandler>();
+      pFileHandler = std::make_shared<FileHandler::FileHandler>();
 
-      fHandler->DisplayChoice();
-      fHandler->SetFileName();
+      try{
+        pFileHandler->DisplayChoice();
+      } catch(std::exception& e){
+        std::cerr << e.what() << std::endl;
+        isRunning = false;
+        return;
+      }
 
-      const std::string fileName = fHandler->GetFileName();
-      
-      if(fHandler->GetChoice() == 1){
-        printf("Creating file: %s\n", fileName.c_str());
-        fHandler->CreateFile(fileName);
-        printf("File %s created successfully!\n", fileName.c_str());
+      // Get filename
+      pFileHandler->SetFileName();
+      const std::string fileName = pFileHandler->GetFileName();
+
+      if(fileName.empty()){
+        std::cerr << "No file name provided!" << std::endl;
+        return;
       }
-      if(fHandler->GetChoice() == 2){
-        assert(std::filesystem::exists(fileName));
-        fHandler->SaveToFile(this, fileName);
-        printf("File %s saved successfully!\n", fileName.c_str());
-      }
-      if(fHandler->GetChoice() == 3){
-        for(const auto& line : fHandler->ReadFile(fileName)){
-          std::cout << line << '\n';
+
+      const int choice = pFileHandler->GetChoice();
+      bool success = false;
+
+      switch(choice){
+        case 1:
+          std::cout << "Creating file: " << fileName << std::endl;
+          success = pFileHandler->CreateFile(fileName);
+          if(success){
+            std::cout << "File " << fileName << " created successfully!" << std::endl;
+          }
+          break;
+    
+        case 2:
+          success = pFileHandler->SaveToFile(this, fileName);
+          if(success){
+            std::cout << "File " << fileName << " saved successfully!" << std::endl;
+          }
+          break;
+        
+        case 3:{
+          auto lines = pFileHandler->ReadFile(fileName);
+          if(lines.empty()){
+            std::cout << "File " << fileName << " is empty!" << std::endl;
+          } else {
+            std::cout << fileName << " contents: " << std::endl;
+            for(const auto& line : lines){
+              std::cout << line << '\n';
+            }
+          }
+          break;
         }
+
+        default:
+          std::cerr << "Invalid choice!" << std::endl;
+          break;
       }
       isRunning = false;
-      return;
     }
   }
 

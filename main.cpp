@@ -9,7 +9,6 @@
 
     App.DisplayMenu();
 
-
     while(App.isRunning){
         App.Update();
     }

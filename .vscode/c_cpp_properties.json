@@ -4,17 +4,18 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/include/c++/15",
+                "/usr/include/c++/15/**",
                 "/usr/include/c++/15/backward",
-                "/usr/include"
+                "/usr/include/**",
+                "/usr/include/c++/15:/usr/include/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c17",
-            "cppStandard": "c++17",
+            "cppStandard": "c++23",
             "intelliSenseMode": "linux-gcc-x64",
             "compilerArgs": [
-                "-std=c++17"
+                "-std=c++23"
             ],
             "browse": {
                 "path": [

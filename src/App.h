@@ -25,6 +25,7 @@ public:
   int GetReps() const {return m_reps;}
   int GetWeightKG() const {return m_weight_kg;}
   int getWeightLBS() const {return m_weight_lbs;}
+  std::size_t GetTime() const {return m_time;}
   /*/ @NOTE: Should be logging the exercises and persist in memory somehow /*/
   std::vector<Fitter> LogExercise(const Fitter& exercise);
 
@@ -40,7 +41,7 @@ public:
   uint8_t choice = 0;
 
 private:
-  std::shared_ptr<FileHandler::FileHandler> fHandler = nullptr;
+  std::shared_ptr<FileHandler::FileHandler> pFileHandler = nullptr;
   std::time_t m_time;
   std::string m_name;
   int m_sets{0};

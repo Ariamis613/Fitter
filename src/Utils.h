@@ -7,20 +7,25 @@
 
 using FsPath = std::filesystem::path;
 
-namespace utils{
-    bool ScanDirectoryForFile(std::string_view fileName, const std::string& directory);
-    bool MoveFile(std::string_view source, std::string_view destination);
-    bool DeleteFile(std::string_view fileName);
-    std::string GetSubdirectory();
-    FsPath GetUserDirectory(std::string_view subdirectory);
+// Replace macros with inline constexpr variables
+inline constexpr double POUNDS_TO_KG = 0.45359237;
+inline constexpr double KG_TO_POUNDS = 2.20462262;
+
+class Utils{
+public:
+    static bool ScanDirectoryForFile(std::string_view fileName, const std::string& directory);
+    static bool MoveFile(std::string_view source, std::string_view destination);
+    static bool DeleteFile(std::string_view fileName);
+    static std::string GetSubdirectory();
+    static FsPath GetUserDirectory(std::string_view subdirectory);
 
     template<typename T>
-    double ConvertToKg(T lbsValue){
-        return lbsValue * 0.45359237;
+    static double ConvertToKg(T lbsValue){
+        return lbsValue * POUNDS_TO_KG;
     }
 
     template<typename T>
-    double ConvertToLbs(T kgValue){
-        return kgValue * 2.20462262;
+    static double ConvertToLbs(T kgValue){
+        return kgValue * KG_TO_POUNDS;
     }
-} // namespace utils
+};

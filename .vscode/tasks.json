@@ -2,16 +2,21 @@
   "version": "2.0.0",
   "tasks": [
       {
-          "label": "build",
+          "label": "build-debug",
           "type": "shell",
-          "command": "g++",
+          "command": "${workspaceFolder}/compile.sh",
           "args": [
-              "-std=c++17",
+              "-std=c++23",
               "-g",
               "${workspaceFolder}/main.cpp",
               "${workspaceFolder}/src/*.cpp",
               "-o",
-              "${workspaceFolder}/bin/fitter"
+              "${workspaceFolder}/bin/Fitter",
+              "-I/usr/include/c++/15",
+              "-I/usr/include",
+              "-L/usr/lib64",
+              "-lstdc++",
+              "-lstdc++fs",
           ],
           "group": {
               "kind": "build",

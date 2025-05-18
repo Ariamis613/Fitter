@@ -8,10 +8,8 @@ static constexpr std::array<char, 4> directoryDelimiters = {
   '\\', '/', ':','|'
 };
 
-namespace utils {
-
 // * @NOTE: Checks if the file exists in the directory //
-bool ScanDirectoryForFile(std::string_view fileName, const std::string& directory) {
+bool Utils::ScanDirectoryForFile(std::string_view fileName, const std::string& directory) {
   FsPath dirPath(directory);
 
   if (!std::filesystem::is_directory(directory)) {
@@ -29,7 +27,7 @@ bool ScanDirectoryForFile(std::string_view fileName, const std::string& director
          std::filesystem::is_regular_file(fullPath);
 }
 
-bool MoveFile(std::string_view source, std::string_view destination) {
+bool Utils::MoveFile(std::string_view source, std::string_view destination) {
   try {
     std::filesystem::rename(source, destination);
     return true;
@@ -39,7 +37,7 @@ bool MoveFile(std::string_view source, std::string_view destination) {
   }
 }
 
-bool DeleteFile(std::string_view fileName) {
+bool Utils::DeleteFile(std::string_view fileName) {
   try {
     return std::filesystem::remove(fileName);
   } catch (const std::exception& e) {
@@ -48,12 +46,14 @@ bool DeleteFile(std::string_view fileName) {
   }
 }
 
-std::string GetSubdirectory() {
+std::string Utils::GetSubdirectory() {
   std::string subdirectory{};
 
-  while (true) {
-    std::cout << "Enter the subdirectory name (e.g 'Desktop'): ";
+  while(true) {
+    std::cout << "Enter the subdirectory name (e.g 'Desktop' or 'Documents/.../.../...'): ";
     std::getline(std::cin, subdirectory);
+
+    std::cout << std::endl;
 
     if (subdirectory.empty()) {
       std::cerr << "Subdirectory name cannot be empty!" << std::endl;
@@ -62,23 +62,22 @@ std::string GetSubdirectory() {
     if (std::any_of(directoryDelimiters.begin(), directoryDelimiters.end(),
                     [&subdirectory](char delim) {
                       return subdirectory.find(delim) != std::string::npos;
-                    })) {
-      std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', "
-                   "'..', or ':'."
-                << std::endl;
+                    })){
+                   std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', "
+                   "'..', or ':'." << std::endl;
     }
     break;
   }
   return subdirectory;
 }
 
-FsPath GetUserDirectory(std::string_view subdirectory) {
+FsPath Utils::GetUserDirectory(std::string_view subdirectory) {
   FsPath directory{};
 
   try {
 #ifdef _WIN32  // WINDOWS
     const char* homeDir = std::getenv("USERPROFILE");
-    if (!userProfile) {
+    if (!homeDir) {
       std::cerr << "Failed to resolve user profile directory!" << std::endl;
     }
     directory = homeDir;
@@ -115,4 +114,3 @@ FsPath GetUserDirectory(std::string_view subdirectory) {
     return directory;
   }
 }
-}  // namespace utils

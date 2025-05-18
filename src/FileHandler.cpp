@@ -6,9 +6,10 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <string>
-#include <string_view>
 #include <sys/stat.h>
+#include <cstring>  // For strchr and strlen
 
 namespace FileHandler{
 
@@ -129,14 +130,15 @@ namespace FileHandler{
         }
     }
 
-    bool FileHandler::SaveToFile(Fitter::Fitter* object, std::string_view fileName){
+    // Saves data to an existing file
+    bool FileHandler::SaveToFile(Fitter::Fitter* object, FsPath filePath){
         if(object == nullptr){
             std::cerr << "Cannot save null object!" << std::endl;
             return false;
         }
 
-        // Use provided fileName or fall back to m_fileName if available
-        auto targetFile = fileName.empty() ? m_fileName : std::string(fileName);
+        // Use provided filePath or fall back to m_fileName if available
+        std::string targetFile = filePath.empty() ? m_fileName : filePath.string();
         
         if(targetFile.empty()){
             std::cerr << "No filename specified!" << std::endl;
@@ -144,22 +146,36 @@ namespace FileHandler{
         }
 
         try{
+            // Check if file exists
+            if(!std::filesystem::exists(targetFile)){
+                std::cerr << "File does not exist: " << targetFile << std::endl;
+                std::cerr << "Use CreateFile() first or provide a valid file path." << std::endl;
+                return false;
+            }
+            
+            // Open file for writing
             std::ofstream outFile(targetFile);
             if(!outFile.is_open()){
-                std::cerr << "Failed to open file: " << targetFile << std::endl;
+                std::cerr << "Failed to open file for writing: " << targetFile << std::endl;
                 return false;
             }
 
-            outFile << *object;
+            outFile << "Exercise: "  << object->GetExcersiseName() << ", Sets: "
+                    << object->GetSets() << ", Reps: " << object->GetReps()
+                    << ", Weight: " << object->GetWeightKG() << "kg, lbs: "
+                    << object->getWeightLBS() << ", Time: " << object->GetTime()
+                    << std::endl;
+                    
             outFile << std::endl;
+            outFile << "SaveFile() called" << std::endl;
             outFile.close();
 
-            // Update m_fileName if we used a new filename
-            if(!fileName.empty() && m_fileName != targetFile){
+            // Update m_fileName if we used a new path
+            if(!filePath.empty() && m_fileName != targetFile){
                 m_fileName = targetFile;
             }
 
-            std::cout << "File saved successfully to: " << m_fileName << std::endl;
+            std::cout << "Data saved successfully to: " << targetFile << std::endl;
             return true;
         } catch(const std::exception& e){
             std::cerr << "Error saving file: " << e.what() << std::endl;
@@ -170,19 +186,16 @@ namespace FileHandler{
     bool FileHandler::CreateFile(const std::string& fileName){
         CloseFile();
 
-        const auto userSubdirectory = utils::GetSubdirectory();
-        auto subdirectory = utils::GetUserDirectory(userSubdirectory);
+        const auto userSubdirectory = Utils::GetSubdirectory();
+        auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
 
         try{
             if(std::filesystem::exists(fileName)){
                 std::cerr << "File already exists!" << std::endl;
             }
 
-            #ifdef _WIN32
+            // std::filesystem::path works the same on Windows and Linux
             const auto fullPath = subdirectory / fileName;
-            #else
-            const auto fullPath = subdirectory / fileName;
-            #endif
 
             std::ofstream newFile(fullPath);
 
@@ -192,7 +205,7 @@ namespace FileHandler{
 
             newFile.close();
             
-            std::cout << "File created successfully!: " << fullPath << std::endl;
+            std::cout << "File created at: " << fullPath << std::endl;
             return true;
         }
         catch(const std::exception& e){
@@ -201,8 +214,8 @@ namespace FileHandler{
         }
     }
 
-    bool FileHandler::IsValidFileName(const std::string& fileName) const{
-        if(fileName.empty()){
+    bool FileHandler::IsValidFileName(const char* fileName){
+        if(fileName == nullptr || fileName[0] == '\0'){
             std::cerr << "File name cannot be empty!" << std::endl;
             return false;
         }
@@ -211,14 +224,19 @@ namespace FileHandler{
             '\\', '/', ':', '*', '?', '\"', '<', '>', '|'
         };
 
-        for(const auto& invalid : invalidChars){
-            if(fileName.find(invalid) != std::string::npos){
+        // Check for invalid characters
+        for(const auto invalidChar : invalidChars){
+            if(strchr(fileName, invalidChar) != nullptr){
                 std::cerr << "File name contains invalid characters!" << std::endl;
                 return false;
             }
         }
-        if (fileName.front() == ' ' || fileName.back() == ' ' ||
-        fileName.front() == '.' || fileName.back() == '.'){
+
+        // Check for leading/trailing spaces or periods
+        size_t len = strlen(fileName);
+        if (fileName[0] == ' ' || fileName[len-1] == ' ' ||
+            fileName[0] == '.' || fileName[len-1] == '.'){
+            std::cerr << "File name cannot start or end with spaces or periods!" << std::endl;
             return false;
         }
         return true;
@@ -228,13 +246,18 @@ namespace FileHandler{
     std::string FileHandler::SetFileName(){
         std::string fileName{};
 
+        // Clear any leftover characters in the input buffer
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        
+        std::cout << "Enter filename: ";
         std::getline(std::cin, fileName);
-        m_fileName = fileName;
-
-        if(!IsValidFileName(m_fileName)){
+        
+        if(!IsValidFileName(fileName.c_str())){
             std::cerr << "Filename is invalid!" << std::endl;
             return "";
         }
+        
+        m_fileName = fileName;
         return m_fileName;
     }
 } //namespace FileHandler

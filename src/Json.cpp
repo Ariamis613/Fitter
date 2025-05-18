@@ -6,7 +6,7 @@
 
 //     JSON::JSON() : data(nlohmann::json::object()){}
 
-//     JSON::JSON(const std::string file) : m_file(file){}
+//     JSON::JSON(const std::string_view file) : m_file(file){}
 
 //     JSON::JSON(const nlohmann::json& json) : data(json){}
 
