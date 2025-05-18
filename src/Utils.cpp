@@ -101,7 +101,7 @@ FsPath Utils::GetUserDirectory(std::string_view subdirectory) {
                   << std::endl;
 
         FsPath docsDir = directory / "Documents";
-        if (std::filesystem::exists(docsDir)) {
+        if(std::filesystem::exists(docsDir)) {
           return docsDir;
           std::cout << "Default directory set: 'Documents'" << std::endl;
         }

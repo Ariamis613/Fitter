@@ -160,10 +160,12 @@ namespace FileHandler{
                 return false;
             }
 
+            auto time = object->GetNow();
+
             outFile << "Exercise: "  << object->GetExcersiseName() << ", Sets: "
                     << object->GetSets() << ", Reps: " << object->GetReps()
                     << ", Weight: " << object->GetWeightKG() << "kg, lbs: "
-                    << object->getWeightLBS() << ", Time: " << object->GetTime()
+                    << object->getWeightLBS() << ", Time: " << std::asctime(time)
                     << std::endl;
                     
             outFile << std::endl;

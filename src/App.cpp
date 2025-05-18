@@ -13,7 +13,7 @@ extern "C"{
 namespace Fitter{
 
   Fitter::Fitter(const std::string name, const unsigned int sets, const unsigned int reps, const float weight,
-    std::time_t time) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight), m_time(time){
+    std::time_t localTime) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight), m_time(localTime){
   }
   Fitter::Fitter() = default;
   Fitter::~Fitter(){
@@ -48,7 +48,7 @@ namespace Fitter{
   std::ostream& operator<<(std::ostream& os, const Fitter& obj) {
     os << "Name: " << obj.m_name << ", Sets: " << obj.m_sets << ", Reps: " << obj.m_reps
        << ", Weight: " << obj.m_weight_kg << "kg, lbs: " << Utils::ConvertToLbs(obj.m_weight_kg) <<
-                                     ", Time: " << std::asctime(std::localtime(&obj.m_time));
+                                     ", Time: " << obj.m_time;
     return os;
   }
 
@@ -78,13 +78,12 @@ namespace Fitter{
     std::cin >> weight;
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    
+
     FileHandler::FileHandler::ClearScreen();
 
-    return Fitter(name, reps, sets, weight);
+    return Fitter(name, reps, sets, weight, m_time);
   }
 
-  // HERE
   void Fitter::Update(){
     while(isRunning){
       pFileHandler = std::make_shared<FileHandler::FileHandler>();

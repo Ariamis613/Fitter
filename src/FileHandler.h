@@ -48,7 +48,7 @@ public:
     void CloseFile();
     int DisplayChoice();
     int GetChoice() const;
-    void OpenFile(const std::string& fileName, FileMode mode = FileMode::BINARY);
+    void OpenFile(const std::string& fileName, FileMode mode = FileMode::READ);
     static void ClearScreen();
 
 private:

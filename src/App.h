@@ -5,6 +5,7 @@
 #include <memory>
 #include <cstdint>
 #include <ctime>
+#include <chrono>
 
 // forward declaration
 namespace FileHandler{
@@ -12,11 +13,10 @@ namespace FileHandler{
 }
 
 namespace Fitter{
-
 class Fitter{
 public:
-  Fitter(const std::string name, const unsigned int sets, const unsigned int reps, const float weight,
-                                       std::time_t time = std::time(nullptr));
+  Fitter(const std::string name, const unsigned int sets,
+        const unsigned int reps, const float weight, std::time_t localTime);
   Fitter();
   ~Fitter();
   
@@ -25,8 +25,8 @@ public:
   int GetReps() const {return m_reps;}
   int GetWeightKG() const {return m_weight_kg;}
   int getWeightLBS() const {return m_weight_lbs;}
-  std::size_t GetTime() const {return m_time;}
-  /*/ @NOTE: Should be logging the exercises and persist in memory somehow /*/
+  std::tm* GetNow() const {return std::localtime(&m_time);}
+  /*/ @NOTE(ari): Should be logging the exercises and persist in memory somehow /*/
   std::vector<Fitter> LogExercise(const Fitter& exercise);
 
   void Start();
@@ -42,8 +42,8 @@ public:
 
 private:
   std::shared_ptr<FileHandler::FileHandler> pFileHandler = nullptr;
-  std::time_t m_time;
-  std::string m_name;
+  std::time_t m_time = std::time(0);
+  std::string m_name = "";
   int m_sets{0};
   int m_reps{0};
   float m_weight_kg{0.00f};

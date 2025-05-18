@@ -7,7 +7,7 @@ mkdir -p bin
 export CPATH="/usr/include/c++/15:/usr/include"
 
 # Compile with explicit path to libstdc++
-g++ -std=c++23 main.cpp src/*.cpp -o bin/Fitter \
+g++ -std=c++23 -O2 main.cpp src/*.cpp -o bin/Fitter \
   -I/usr/include/c++/15 \
   -I/usr/include \
   -L/usr/lib64 \
