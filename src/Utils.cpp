@@ -1,10 +1,9 @@
 #include "Utils.h"
 
-#include <algorithm>
 #include <array>
 #include <iostream>
 
-static constexpr std::array<char, 4> directoryDelimiters = {
+inline static constexpr std::array<char, 4> directoryDelimiters = {
   '\\', '/', ':','|'
 };
 
@@ -58,13 +57,6 @@ std::string Utils::GetSubdirectory() {
     if (subdirectory.empty()) {
       std::cerr << "Subdirectory name cannot be empty!" << std::endl;
       continue;
-    }
-    if (std::any_of(directoryDelimiters.begin(), directoryDelimiters.end(),
-                    [&subdirectory](char delim) {
-                      return subdirectory.find(delim) != std::string::npos;
-                    })){
-                   std::cout << "Invalid subdirectory name. Please avoid using '/', '\\', "
-                   "'..', or ':'." << std::endl;
     }
     break;
   }

@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <array>
 #include <vector>
+#include <optional>
 
 enum class FileMode{
     READ,
@@ -37,7 +38,7 @@ public:
 
     virtual bool CreateFile(const std::string& fileName); 
     virtual bool SaveToFile(Fitter::Fitter* object, FsPath file); 
-    virtual std::vector<std::string> ReadFile(const std::string& file);
+    virtual std::optional<std::vector<std::string>> ReadFile(const std::string& fileName);
 
     // * Getters
     std::string GetFileName() const;

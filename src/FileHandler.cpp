@@ -2,7 +2,6 @@
 #include "App.h"
 #include "Utils.h"
 
-
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -110,22 +109,44 @@ namespace FileHandler{
     }
 
     // @ari: Debating whether to make this a void or keep it that way
-    std::vector<std::string> FileHandler::ReadFile(const std::string& file){
-
-        constexpr std::ios_base::openmode mode = std::ios_base::in;
-
+    std::optional<std::vector<std::string>> FileHandler::ReadFile(const std::string& fileName){
         std::vector<std::string> lines_v{};
         
-        std::string buffer{};
-
         try{
+            // Close any previously opened file
+            CloseFile();
+            
+            // Resolve the file path similar to CreateFile
+            const auto userSubdirectory = Utils::GetSubdirectory();
+            auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
+            const auto fullPath = subdirectory / fileName;
+            
+            // Open the file for reading with the full path
+            OpenFile(fullPath.string(), FileMode::READ);
+            
+            if(!m_fileStream.is_open()){
+                std::cerr << "Failed to open file: " << fullPath.string() << std::endl;
+                return {};
+            }
+
+            std::string buffer{};
             while(std::getline(m_fileStream, buffer)){
                 lines_v.emplace_back(buffer);
             }
+            
+            // Check if we reached the end of file properly
+            if(m_fileStream.eof()){
+                // Clear EOF flag
+                m_fileStream.clear();
+            } else if(m_fileStream.fail() && !lines_v.empty()) {
+                // Some error occurred during reading, but we got some lines
+                std::cerr << "Warning: Error while reading file (some data may be missing)" << std::endl;
+            }
+
             return lines_v;
         }
         catch(const std::exception& e){
-            std::cerr << e.what() << std::endl;
+            std::cerr << "Error reading file: " << e.what() << std::endl;
             return {};
         }
     }
@@ -137,26 +158,35 @@ namespace FileHandler{
             return false;
         }
 
-        // Use provided filePath or fall back to m_fileName if available
-        std::string targetFile = filePath.empty() ? m_fileName : filePath.string();
+        std::string baseFileName;
         
-        if(targetFile.empty()){
+        // Determine which filename to use
+        if(!filePath.empty()) {
+            baseFileName = filePath.filename().string();
+        } else if(!m_fileName.empty()) {
+            baseFileName = m_fileName;
+        } else {
             std::cerr << "No filename specified!" << std::endl;
             return false;
         }
-
+        
         try{
+            // Resolve the full path similar to other functions
+            const auto userSubdirectory = Utils::GetSubdirectory();
+            auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
+            const auto fullPath = subdirectory / baseFileName;
+            
             // Check if file exists
-            if(!std::filesystem::exists(targetFile)){
-                std::cerr << "File does not exist: " << targetFile << std::endl;
+            if(!std::filesystem::exists(fullPath)){
+                std::cerr << "File does not exist: " << fullPath.string() << std::endl;
                 std::cerr << "Use CreateFile() first or provide a valid file path." << std::endl;
                 return false;
             }
             
             // Open file for writing
-            std::ofstream outFile(targetFile);
+            std::ofstream outFile(fullPath);
             if(!outFile.is_open()){
-                std::cerr << "Failed to open file for writing: " << targetFile << std::endl;
+                std::cerr << "Failed to open file for writing: " << fullPath.string() << std::endl;
                 return false;
             }
 
@@ -165,19 +195,17 @@ namespace FileHandler{
             outFile << "Exercise: "  << object->GetExcersiseName() << ", Sets: "
                     << object->GetSets() << ", Reps: " << object->GetReps()
                     << ", Weight: " << object->GetWeightKG() << "kg, lbs: "
-                    << object->getWeightLBS() << ", Time: " << std::asctime(time)
+                    << object->GetWeightLBS() << ", Time: " << std::asctime(time)
                     << std::endl;
                     
             outFile << std::endl;
             outFile << "SaveFile() called" << std::endl;
             outFile.close();
 
-            // Update m_fileName if we used a new path
-            if(!filePath.empty() && m_fileName != targetFile){
-                m_fileName = targetFile;
-            }
+            // Update m_fileName to the base filename
+            m_fileName = baseFileName;
 
-            std::cout << "Data saved successfully to: " << targetFile << std::endl;
+            std::cout << "Data saved successfully to: " << fullPath.string() << std::endl;
             return true;
         } catch(const std::exception& e){
             std::cerr << "Error saving file: " << e.what() << std::endl;

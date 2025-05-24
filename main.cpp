@@ -7,7 +7,11 @@
 
     App.Start();
 
-    App.DisplayMenu();
+    // Store the exercise data returned from DisplayMenu
+    Fitter::Fitter exerciseData = App.DisplayMenu();
+
+    // Copy the exercise data to the main App object
+    App = exerciseData;
 
     while(App.isRunning){
         App.Update();

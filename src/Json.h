@@ -17,7 +17,7 @@
 //     ~JSON();
 
 //     bool SaveToFile(Fitter::Fitter* object, FsPath file) override;
-//     std::vector<std::string> ReadFile(const std::string& file) override;
+//     std::optional<std::vector<std::string>> ReadFile(const std::string& file) override;
 //     bool CreateFile(const std::string& file) override;
 
 //     // TODO: Implement later

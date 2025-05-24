@@ -20,11 +20,14 @@ public:
   Fitter();
   ~Fitter();
   
+  // Copy assignment operator
+  Fitter& operator=(const Fitter& other);
+  
   std::string GetExcersiseName() const {return m_name;}
   int GetSets() const {return m_sets;}
   int GetReps() const {return m_reps;}
-  int GetWeightKG() const {return m_weight_kg;}
-  int getWeightLBS() const {return m_weight_lbs;}
+  float GetWeightKG() const {return m_weight_kg;}
+  float GetWeightLBS() const {return m_weight_lbs;}
   std::tm* GetNow() const {return std::localtime(&m_time);}
   /*/ @NOTE(ari): Should be logging the exercises and persist in memory somehow /*/
   std::vector<Fitter> LogExercise(const Fitter& exercise);

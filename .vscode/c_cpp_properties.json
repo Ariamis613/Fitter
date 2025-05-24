@@ -11,11 +11,12 @@
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",
-            "cStandard": "c17",
+            "cStandard": "c23",
             "cppStandard": "c++23",
             "intelliSenseMode": "linux-gcc-x64",
             "compilerArgs": [
-                "-std=c++23"
+                "-std=c++23",
+                "-O2"
             ],
             "browse": {
                 "path": [
