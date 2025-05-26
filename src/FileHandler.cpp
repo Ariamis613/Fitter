@@ -11,6 +11,8 @@
 #include <cstring>  // For strchr and strlen
 
 namespace FileHandler{
+    inline static constexpr int MAX_CHOICE = 6;
+    inline static constexpr int MIN_CHOICE = 1;
 
     FileHandler::FileHandler(std::fstream&& fileStream) : m_fileStream(std::move(fileStream)) {
     }
@@ -65,13 +67,16 @@ namespace FileHandler{
         std::cout << "1. Create a new file.\n";
         std::cout << "2. Save to file.\n";
         std::cout << "3. Read from file.\n";
+        std::cout << "4. Delete file.\n";
+        // TODO
+        std::cout << "5. Append to file.\n";
         std::cout << std::endl;
 
         std::cin >> m_choice;
 
         ClearScreen();
 
-        return m_choice > 0 && m_choice <= 3 ? m_choice : throw std::invalid_argument("Number should be between 1-3!\n");
+        return m_choice >= MIN_CHOICE && m_choice <= MAX_CHOICE ? m_choice : throw std::invalid_argument("Number should be between 1-3!\n");
     }
 
     void FileHandler::OpenFile(const std::string& fileName, const FileMode mode){
@@ -159,9 +164,8 @@ namespace FileHandler{
         }
 
         std::string baseFileName;
-        
         // Determine which filename to use
-        if(!filePath.empty()) {
+        if(!filePath.empty()){
             baseFileName = filePath.filename().string();
         } else if(!m_fileName.empty()) {
             baseFileName = m_fileName;
@@ -183,24 +187,27 @@ namespace FileHandler{
                 return false;
             }
             
-            // Open file for writing
-            std::ofstream outFile(fullPath);
-            if(!outFile.is_open()){
+            // Use OpenFile instead of directly creating std::ofstream
+            OpenFile(fullPath.string(), FileMode::WRITE);
+            
+            if(!m_fileStream.is_open()){
                 std::cerr << "Failed to open file for writing: " << fullPath.string() << std::endl;
                 return false;
             }
 
             auto time = object->GetNow();
 
-            outFile << "Exercise: "  << object->GetExcersiseName() << ", Sets: "
+            m_fileStream << "Exercise: "  << object->GetExcersiseName() << ", Sets: "
                     << object->GetSets() << ", Reps: " << object->GetReps()
                     << ", Weight: " << object->GetWeightKG() << "kg, lbs: "
                     << object->GetWeightLBS() << ", Time: " << std::asctime(time)
                     << std::endl;
                     
-            outFile << std::endl;
-            outFile << "SaveFile() called" << std::endl;
-            outFile.close();
+            m_fileStream << std::endl;
+            m_fileStream << "SaveFile() called" << std::endl;
+            
+            // Close the file
+            CloseFile();
 
             // Update m_fileName to the base filename
             m_fileName = baseFileName;
@@ -289,5 +296,76 @@ namespace FileHandler{
         
         m_fileName = fileName;
         return m_fileName;
+    }
+
+    void FileHandler::DeleteFile(const char* filePath){
+    const auto userSubdirectory = Utils::GetSubdirectory();
+    auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
+    const auto fullPath = subdirectory / filePath;
+
+    try{
+    if(std::filesystem::exists(fullPath)){
+      std::filesystem::remove(fullPath);
+      std::cout << "File: " << filePath << " deleted successfully." << std::endl;
+
+    } else{
+      std::cout << "File: " << filePath << " doesn't exist." << std::endl;
+      return;
+    }
+    } catch(std::exception& e){
+      std::cerr << "Error deleting file: " << e.what() << std::endl;
+      return;
+    }
+  }
+
+    bool FileHandler::AppendToFile(Fitter::Fitter* object, FsPath filePath){
+        if(object == nullptr || filePath.empty()){
+            std::cerr << "Cannot append null object or empty file path!";
+            return false;
+        }
+
+        try{
+            // Resolve the full path similar to other functions
+            const auto userSubdirectory = Utils::GetSubdirectory();
+            auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
+            const auto fullPath = subdirectory / filePath.filename().string();
+            
+            // Check if file exists
+            if(!std::filesystem::exists(fullPath)){
+                std::cerr << "File does not exist: " << fullPath.string() << std::endl;
+                std::cerr << "Use CreateFile() first or provide a valid file path." << std::endl;
+                return false;
+            }
+            
+            OpenFile(fullPath.string(), FileMode::APPEND);
+            
+            if(!m_fileStream.is_open()){
+                std::cerr << "Failed to open file for writing: " << fullPath.string() << std::endl;
+                return false;
+            }
+
+            auto time = object->GetNow();
+
+            m_fileStream << "Exercise: "  << object->GetExcersiseName() << ", Sets: "
+                    << object->GetSets() << ", Reps: " << object->GetReps()
+                    << ", Weight: " << object->GetWeightKG() << "kg, lbs: "
+                    << object->GetWeightLBS() << ", Time: " << std::asctime(time)
+                    << std::endl;
+                    
+            m_fileStream << std::endl;
+            m_fileStream << "SaveFile() called" << std::endl;
+            
+            // Close the file
+            CloseFile();
+
+            // Update m_fileName to the base filename
+            m_fileName = filePath.filename().string();
+
+            std::cout << "Data saved successfully to: " << fullPath.string() << std::endl;
+            return true;
+        } catch(const std::exception& e){
+            std::cerr << "Error saving file: " << e.what() << std::endl;
+            return false;
+        }
     }
 } //namespace FileHandler

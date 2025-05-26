@@ -14,7 +14,9 @@ namespace Fitter{
     std::time_t localTime) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight), m_time(localTime){
     m_weight_lbs = Utils::ConvertToLbs(weight);
   }
+  
   Fitter::Fitter() = default;
+
   Fitter::~Fitter(){
     // Clean up resources if necessary
     exerciseBuffer.clear(); // Clear the exercise buffer
@@ -73,9 +75,9 @@ namespace Fitter{
   }
 
   void Fitter::Start(){
-    std::cout << "Welcome to Fitter! \n";
-    std::cout << "Your personal workout tracking application\n";
-    std::cout << "----------------------------------------\n";
+    printf("Welcome to Fitter! \n");
+    printf("Your personal workout tracking application\n");
+    printf("----------------------------------------\n");
     
     // Initialize resources
     exerciseBuffer.clear();
@@ -134,17 +136,17 @@ namespace Fitter{
 
       switch(choice){
         case 1:
-          std::cout << "Creating file: " << fileName << std::endl;
+          printf("Creating file: %s \n", fileName.c_str());
           success = pFileHandler->CreateFile(fileName);
           if(success){
-            std::cout << "File " << fileName << " created successfully!" << std::endl;
+            printf("File %s created successfully!\n", fileName.c_str());
           } else{
             std::cerr << "Failed to create file: " << fileName << std::endl;
           }
           break;
     
         case 2:
-          std::cout << "Saving to file: " << fileName << std::endl;
+          printf("Saving to file: %s \n", fileName.c_str()); 
           success = pFileHandler->SaveToFile(this, fileName);
           if(!success){
             std::cerr << "Failed to save to file: " << fileName << std::endl;
@@ -152,22 +154,42 @@ namespace Fitter{
           break;
         
         case 3:{
-          std::cout << "Reading file: " << fileName << std::endl;
+          printf("Reading file: %s \n", fileName.c_str());
           auto lines = pFileHandler->ReadFile(fileName);
 
           if(!lines.has_value() || lines->empty()){
-            std::cout << "No content found in file " << fileName << std::endl;
-            std::cout << "The file may be empty or could not be opened." << std::endl;
+            printf("No content found in file %s\n", fileName.c_str());
+            printf("The file may be empty or could not be opened.\n");
           } else{
             std::cout << fileName << " contents (" << lines->size() << " lines): " << std::endl;
-            std::cout << "----------------------------------------" << std::endl;
+            printf("----------------------------------------");
             for(const auto& line : *lines){
               std::cout << line << '\n';
             }
-            std::cout << "----------------------------------------" << std::endl;
+            printf("----------------------------------------\n");
           }
           break;
         }
+        case 4:
+          printf("Deleting file: %s\n", fileName.c_str());
+          try {
+            pFileHandler->DeleteFile(fileName.c_str());
+            printf("----------------------------------------\n");
+            printf("File deletion operation completed.\n");
+          } catch(const std::exception& e) {
+            std::cerr << "Error during file deletion: " << e.what() << std::endl;
+          }
+          break;
+        
+        case 5:
+          printf("Appending to file: %s\n", fileName.c_str());
+          success = pFileHandler->AppendToFile(this, fileName);
+          if(!success) {
+            std::cerr << "Failed to append to file: " << fileName << std::endl;
+          } else {
+            std::cout << "Successfully appended to file: " << fileName << std::endl;
+          }
+          break;
 
         default:
           std::cerr << "Invalid choice!" << std::endl;
@@ -176,8 +198,4 @@ namespace Fitter{
       isRunning = false;
     }
   }
-
-  //void Fitter::DeleteFile(){
-  //}
-
 } // namespace Fitter

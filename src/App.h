@@ -33,7 +33,6 @@ public:
   std::vector<Fitter> LogExercise(const Fitter& exercise);
 
   void Start();
-  void DeleteFile(); // TODO: Implement
   void PrintExerciseObject(const Fitter& ex);
   // void PrintExerciseVector(const std::vector<Fitter>& exercises);
   void Update();

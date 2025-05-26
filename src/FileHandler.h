@@ -39,7 +39,9 @@ public:
     virtual bool CreateFile(const std::string& fileName); 
     virtual bool SaveToFile(Fitter::Fitter* object, FsPath file); 
     virtual std::optional<std::vector<std::string>> ReadFile(const std::string& fileName);
-
+    virtual bool AppendToFile(Fitter::Fitter* object, FsPath file);
+    virtual void DeleteFile(const char* filePath);
+    
     // * Getters
     std::string GetFileName() const;
     std::string SetFileName();
@@ -56,6 +58,6 @@ private:
     std::string m_fileName;
     std::fstream m_fileStream;
     bool m_isOpen = false;
-    unsigned int m_choice{0};    
+    unsigned int m_choice{0};
 };
 } // namespace FileHandler
