@@ -122,3 +122,6 @@ compile_commands.json
 # Backup files
 *.bak
 *.backup
+
+# VS Code settings (user-specific)
+.vscode/

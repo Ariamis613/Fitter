@@ -5,16 +5,11 @@
             "name": "Debug Fitter",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/bin/Fitter",
+            "program": "${workspaceFolder}/build/bin/Fitter",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "environment": [
-                {
-                    "name": "CPATH",
-                    "value": "/usr/include/c++/15:/usr/include"
-                }
-            ],
+            "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
@@ -24,7 +19,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build-debug",
+            "preLaunchTask": "cmake-build",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
