@@ -3,7 +3,6 @@
 #include <string>
 #include <filesystem>
 #include <stdexcept>
-#include <type_traits>
 
 using FsPath = std::filesystem::path;
 
@@ -29,6 +28,7 @@ public:
         return kgValue * KG_TO_POUNDS;
     }
 
+    // NOTE: Not being used currently
     template<typename T>
     static T CalculateVolume(int sets, int reps, double weight){
         return sets * reps * weight;
