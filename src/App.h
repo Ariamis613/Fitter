@@ -34,7 +34,6 @@ public:
 
   void Start();
   void PrintExerciseObject(const Fitter& ex);
-  // void PrintExerciseVector(const std::vector<Fitter>& exercises);
   void Update();
   Fitter DisplayMenu();
   friend std::ostream& operator<<(std::ostream& os, const Fitter& obj);

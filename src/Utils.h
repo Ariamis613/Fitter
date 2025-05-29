@@ -28,4 +28,9 @@ public:
     static double ConvertToLbs(T kgValue){
         return kgValue * KG_TO_POUNDS;
     }
+
+    template<typename T>
+    static T CalculateVolume(int sets, int reps, double weight){
+        return sets * reps * weight;
+    }
 };

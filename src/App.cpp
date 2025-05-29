@@ -121,7 +121,16 @@ namespace Fitter{
         return;
       }
 
-      // Get filename
+      const int choice = pFileHandler->GetChoice();
+      
+      // Exit early if user chose to exit
+      if(choice == 6){
+        printf("Exiting the program...\n");
+        isRunning = false;
+        break;
+      }
+
+      // Get filename - only needed for choices 1-5
       pFileHandler->SetFileName();
       const std::string fileName = pFileHandler->GetFileName();
 
@@ -130,8 +139,6 @@ namespace Fitter{
         isRunning = false;
         return;
       }
-
-      const int choice = pFileHandler->GetChoice();
       bool success = false;
 
       switch(choice){

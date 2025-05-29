@@ -68,8 +68,8 @@ namespace FileHandler{
         std::cout << "2. Save to file.\n";
         std::cout << "3. Read from file.\n";
         std::cout << "4. Delete file.\n";
-        // TODO
         std::cout << "5. Append to file.\n";
+        std::cout << "6. Exit program.\n";
         std::cout << std::endl;
 
         std::cin >> m_choice;
@@ -131,7 +131,7 @@ namespace FileHandler{
             
             if(!m_fileStream.is_open()){
                 std::cerr << "Failed to open file: " << fullPath.string() << std::endl;
-                return {};
+                return std::nullopt;
             }
 
             std::string buffer{};
@@ -147,12 +147,11 @@ namespace FileHandler{
                 // Some error occurred during reading, but we got some lines
                 std::cerr << "Warning: Error while reading file (some data may be missing)" << std::endl;
             }
-
             return lines_v;
         }
         catch(const std::exception& e){
             std::cerr << "Error reading file: " << e.what() << std::endl;
-            return {};
+            return std::nullopt;
         }
     }
 
@@ -204,7 +203,6 @@ namespace FileHandler{
                     << std::endl;
                     
             m_fileStream << std::endl;
-            m_fileStream << "SaveFile() called" << std::endl;
             
             // Close the file
             CloseFile();
@@ -235,7 +233,7 @@ namespace FileHandler{
             const auto fullPath = subdirectory / fileName;
 
             std::ofstream newFile(fullPath);
-
+            
             if(!newFile.is_open()){
                 std::cerr << "Failed to create file: " + fullPath.string();
             }
@@ -353,7 +351,6 @@ namespace FileHandler{
                     << std::endl;
                     
             m_fileStream << std::endl;
-            m_fileStream << "SaveFile() called" << std::endl;
             
             // Close the file
             CloseFile();
@@ -361,7 +358,7 @@ namespace FileHandler{
             // Update m_fileName to the base filename
             m_fileName = filePath.filename().string();
 
-            std::cout << "Data saved successfully to: " << fullPath.string() << std::endl;
+            printf("Data saved successfully to: %s", fullPath.c_str());
             return true;
         } catch(const std::exception& e){
             std::cerr << "Error saving file: " << e.what() << std::endl;

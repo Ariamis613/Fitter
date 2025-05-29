@@ -36,11 +36,11 @@ public:
 
     FileHandler& operator=(const FileHandler&) = delete;
 
-    virtual bool CreateFile(const std::string& fileName); 
-    virtual bool SaveToFile(Fitter::Fitter* object, FsPath file); 
-    virtual std::optional<std::vector<std::string>> ReadFile(const std::string& fileName);
-    virtual bool AppendToFile(Fitter::Fitter* object, FsPath file);
-    virtual void DeleteFile(const char* filePath);
+    bool CreateFile(const std::string& fileName); 
+    bool SaveToFile(Fitter::Fitter* object, FsPath file); 
+    std::optional<std::vector<std::string>> ReadFile(const std::string& fileName);
+    bool AppendToFile(Fitter::Fitter* object, FsPath file);
+    void DeleteFile(const char* filePath);
     
     // * Getters
     std::string GetFileName() const;

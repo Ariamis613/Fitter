@@ -10,15 +10,17 @@
 //  public:
 //     JSON();
 
-//     JSON(const std::string_view file);
+//     JSON(std::string_view file);
 
 //     JSON(const nlohmann::json& json);
 
 //     ~JSON();
 
-//     bool SaveToFile(Fitter::Fitter* object, FsPath file) override;
-//     std::optional<std::vector<std::string>> ReadFile(const std::string& file) override;
-//     bool CreateFile(const std::string& file) override;
+//     bool SaveToFile(Fitter::Fitter* object, FsPath file);
+//     std::optional<std::vector<std::string>> ReadFile(const std::string& file);
+//     bool CreateFile(const std::string& file);
+//     bool AppendToFile(Fitter::Fitter* object, FsPath file);
+//     void DeleteFile(const char* filePath);
 
 //     // TODO: Implement later
 //     JSON& Parse() const;
