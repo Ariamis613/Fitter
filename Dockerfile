@@ -1,12 +1,20 @@
 FROM gcc:latest
 
+# Install CMake
+RUN apt-get update && apt-get install -y cmake && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Copy all source files
-COPY main.cpp .
-COPY src/ ./src/
+# Copy source files and CMake configuration
+COPY . .
 
-# Compile the application
-RUN g++ main.cpp src/App.cpp src/FileHandler.cpp src/Utils.cpp -o main
+# Build using CMake
+RUN mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release .. && \
+    cmake --build .
 
-CMD [ "./main" ]
+# Set the working directory to where the binary is located
+WORKDIR /app/build/bin
+
+# Run the application
+CMD ["./Fitter"]

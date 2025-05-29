@@ -29,8 +29,6 @@ public:
   float GetWeightKG() const {return m_weight_kg;}
   float GetWeightLBS() const {return m_weight_lbs;}
   std::tm* GetNow() const {return std::localtime(&m_time);}
-  /*/ @NOTE(ari): Should be logging the exercises and persist in memory somehow /*/
-  std::vector<Fitter> LogExercise(const Fitter& exercise);
 
   void Start();
   void PrintExerciseObject(const Fitter& ex);

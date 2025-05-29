@@ -105,6 +105,4 @@ FsPath Utils::GetUserDirectory(std::string_view subdirectory) {
     std::cerr << e.what() << std::endl;
     return directory;
   }
-
-  
 }

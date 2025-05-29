@@ -37,29 +37,6 @@ namespace Fitter{
     return *this;
   }
 
-  // void Fitter::PrintExerciseVector(const std::vector<Fitter>& exercises) {
-  //   std::cout << "Exercise History (" << exercises.size() << " entries):" << std::endl;
-  //   std::cout << "----------------------------------------" << std::endl;
-    
-  //   for(size_t i = 0; i < exercises.size(); i++) {
-  //     std::cout << "Entry #" << (i+1) << ": ";
-  //     PrintExerciseObject(exercises[i]);
-  //   }
-    
-  //   std::cout << "----------------------------------------" << std::endl;
-  // }
-
-  std::vector<Fitter> Fitter::LogExercise(const Fitter& exercise){
-    try{
-      exerciseBuffer.emplace_back(exercise);
-      return exerciseBuffer;
-    }
-    catch(std::exception& e){
-      std::cerr << e.what() << std::endl;
-      return {};
-    }
-  }
-
   std::ostream& operator<<(std::ostream& os, const Fitter& obj) {
     os << "Name: " << obj.m_name << ", Sets: " << obj.m_sets << ", Reps: " << obj.m_reps
        << ", Weight: " << obj.m_weight_kg << "kg, lbs: " << Utils::ConvertToLbs(obj.m_weight_kg) <<
@@ -75,9 +52,9 @@ namespace Fitter{
   }
 
   void Fitter::Start(){
-    printf("Welcome to Fitter! \n");
-    printf("Your personal workout tracking application\n");
-    printf("----------------------------------------\n");
+    std::printf("Welcome to Fitter! \n");
+    std::printf("Your personal workout tracking application\n");
+    std::printf("----------------------------------------\n");
     
     // Initialize resources
     exerciseBuffer.clear();

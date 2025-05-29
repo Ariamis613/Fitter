@@ -42,7 +42,6 @@ public:
     bool AppendToFile(Fitter::Fitter* object, FsPath file);
     void DeleteFile(const char* filePath);
     
-    // * Getters
     std::string GetFileName() const;
     std::string SetFileName();
     bool IsFileOpen() const;

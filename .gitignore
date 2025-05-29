@@ -30,5 +30,95 @@
 *.exe
 *.out
 *.app
-*.txt
+
+# Build directories
+build/
+build-*/
+bin/
+lib/
+out/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Compiled binaries (project specific)
+fitter
+fitter_debug
+Fitter
+
+# Debug files
+*.pdb
+*.ilk
+*.exp
+
+# IDE files
+.vscode/
+.vs/
+*.vcxproj*
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# CLion
+.idea/
+cmake-build-*/
+
+# Code::Blocks
+*.cbp
+*.layout
+*.depend
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Package managers
+vcpkg_installed/
+conan.lock
+conanbuildinfo.*
+
+# Testing
+Testing/
+CTestTestfile.cmake
+
+# Coverage reports
+*.gcov
+*.gcda
+*.gcno
+coverage/
+
+# Profiling
+*.prof
+gmon.out
+
+# Language server files
 *.clangd
+.clangd/
+compile_commands.json
+
+# Backup files
+*.bak
+*.backup

@@ -113,7 +113,6 @@ namespace FileHandler{
         }
     }
 
-    // @ari: Debating whether to make this a void or keep it that way
     std::optional<std::vector<std::string>> FileHandler::ReadFile(const std::string& fileName){
         std::vector<std::string> lines_v{};
         
@@ -229,7 +228,6 @@ namespace FileHandler{
                 std::cerr << "File already exists!" << std::endl;
             }
 
-            // std::filesystem::path works the same on Windows and Linux
             const auto fullPath = subdirectory / fileName;
 
             std::ofstream newFile(fullPath);
@@ -323,12 +321,10 @@ namespace FileHandler{
         }
 
         try{
-            // Resolve the full path similar to other functions
             const auto userSubdirectory = Utils::GetSubdirectory();
             auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
             const auto fullPath = subdirectory / filePath.filename().string();
             
-            // Check if file exists
             if(!std::filesystem::exists(fullPath)){
                 std::cerr << "File does not exist: " << fullPath.string() << std::endl;
                 std::cerr << "Use CreateFile() first or provide a valid file path." << std::endl;
@@ -352,10 +348,8 @@ namespace FileHandler{
                     
             m_fileStream << std::endl;
             
-            // Close the file
             CloseFile();
 
-            // Update m_fileName to the base filename
             m_fileName = filePath.filename().string();
 
             printf("Data saved successfully to: %s", fullPath.c_str());
