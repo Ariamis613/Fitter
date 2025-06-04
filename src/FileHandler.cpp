@@ -155,7 +155,7 @@ namespace FileHandler{
     }
 
     // Saves data to an existing file
-    bool FileHandler::SaveToFile(Fitter::Fitter* object, FsPath filePath){
+    bool FileHandler::SaveToFile(Fitter::Fitter* object, FsPath_t filePath){
         if(object == nullptr){
             std::cerr << "Cannot save null object!" << std::endl;
             return false;
@@ -314,7 +314,7 @@ namespace FileHandler{
     }
   }
 
-    bool FileHandler::AppendToFile(Fitter::Fitter* object, FsPath filePath){
+    bool FileHandler::AppendToFile(Fitter::Fitter* object, FsPath_t filePath){
         if(object == nullptr || filePath.empty()){
             std::cerr << "Cannot append null object or empty file path!";
             return false;

@@ -19,7 +19,7 @@ namespace Fitter{
     class Fitter;
 }
 
-using FsPath = std::filesystem::path;
+using FsPath_t = std::filesystem::path;
 
 namespace FileHandler{
 class FileHandler{
@@ -37,9 +37,9 @@ public:
     FileHandler& operator=(const FileHandler&) = delete;
 
     bool CreateFile(const std::string& fileName); 
-    bool SaveToFile(Fitter::Fitter* object, FsPath file); 
+    bool SaveToFile(Fitter::Fitter* object, FsPath_t file); 
     std::optional<std::vector<std::string>> ReadFile(const std::string& fileName);
-    bool AppendToFile(Fitter::Fitter* object, FsPath file);
+    bool AppendToFile(Fitter::Fitter* object, FsPath_t file);
     void DeleteFile(const char* filePath);
     
     std::string GetFileName() const;

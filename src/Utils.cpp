@@ -9,18 +9,18 @@ inline static constexpr std::array<char, 4> directoryDelimiters = {
 
 // * @NOTE: Checks if the file exists in the directory //
 bool Utils::ScanDirectoryForFile(std::string_view fileName, const std::string& directory) {
-  FsPath dirPath(directory);
+  FsPath_t dirPath(directory);
 
   if (!std::filesystem::is_directory(directory)) {
     std::cerr << "Provided directory is invalid\n";
   }
-  FsPath filePath(fileName);
+  FsPath_t filePath(fileName);
   if (filePath.has_parent_path() || filePath.is_absolute()) {
     std::cerr << "Invalid file name\n";
   }
   std::cout << std::endl;
 
-  const FsPath fullPath = dirPath / filePath;
+  const FsPath_t fullPath = dirPath / filePath;
 
   return std::filesystem::exists(fullPath) &&
          std::filesystem::is_regular_file(fullPath);
@@ -63,8 +63,8 @@ std::string Utils::GetSubdirectory() {
   return subdirectory;
 }
 
-FsPath Utils::GetUserDirectory(std::string_view subdirectory) {
-  FsPath directory{};
+FsPath_t Utils::GetUserDirectory(std::string_view subdirectory) {
+  FsPath_t directory{};
 
   try {
 #ifdef _WIN32  // WINDOWS
@@ -81,7 +81,7 @@ FsPath Utils::GetUserDirectory(std::string_view subdirectory) {
     directory = homeDir;
 #endif
 
-    FsPath targetDir = directory / subdirectory;
+    FsPath_t targetDir = directory / subdirectory;
 
     if (!std::filesystem::exists(targetDir)) {
       try {
@@ -92,7 +92,7 @@ FsPath Utils::GetUserDirectory(std::string_view subdirectory) {
         std::cout << "Going back to default directory: 'Documents'... "
                   << std::endl;
 
-        FsPath docsDir = directory / "Documents";
+        FsPath_t docsDir = directory / "Documents";
         if(std::filesystem::exists(docsDir)) {
           return docsDir;
           std::cout << "Default directory set: 'Documents'" << std::endl;

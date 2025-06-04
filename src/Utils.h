@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <stdexcept>
 
-using FsPath = std::filesystem::path;
+using FsPath_t = std::filesystem::path;
 
 // Replace macros with inline constexpr variables
 inline constexpr double POUNDS_TO_KG = 0.45359237;
@@ -16,7 +16,7 @@ public:
     static bool MoveFile(std::string_view source, std::string_view destination);
     static bool DeleteFile(std::string_view fileName);
     static std::string GetSubdirectory();
-    static FsPath GetUserDirectory(std::string_view subdirectory);
+    static FsPath_t GetUserDirectory(std::string_view subdirectory);
 
     template<typename T>
     static double ConvertToKg(T lbsValue){
