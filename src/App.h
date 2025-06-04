@@ -37,7 +37,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const Fitter& obj);
 
   bool isRunning = true;
-  uint8_t choice = 0;
+  int16_t choice = 0;
 
 private:
   std::shared_ptr<FileHandler::FileHandler> pFileHandler = nullptr;

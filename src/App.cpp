@@ -57,9 +57,8 @@ namespace Fitter{
     std::printf("Choose an option: \n");
     std::printf("1. Log an exercise\n");
     std::printf("2. Access the file manager\n");
-    std::cin >> choice;
     std::printf("----------------------------------------\n");
-    
+
     // Initialize resources
     exerciseBuffer.clear();
     pFileHandler = std::make_shared<FileHandler::FileHandler>();
@@ -103,10 +102,10 @@ namespace Fitter{
         return;
       }
 
-      const int choice = pFileHandler->GetChoice();
+      const int fChoice = pFileHandler->GetChoice();
       
       // Exit early if user chose to exit
-      if(choice == 6){
+      if(fChoice == 6){
         printf("Exiting the program...\n");
         isRunning = false;
         break;
@@ -123,10 +122,10 @@ namespace Fitter{
       }
       bool success = false;
 
-      switch(choice){
+      switch(fChoice){
         case 1:
           printf("Creating file: %s \n", fileName.c_str());
-          success = pFileHandler->CreateFile(fileName);
+          success = pFileHandler->CreateFile(fileName) && pFileHandler->SaveToFile(this, fileName);
           if(success){
             printf("File %s created successfully!\n", fileName.c_str());
           } else{
@@ -134,13 +133,13 @@ namespace Fitter{
           }
           break;
     
-        case 2:
-          printf("Saving to file: %s \n", fileName.c_str()); 
-          success = pFileHandler->SaveToFile(this, fileName);
-          if(!success){
-            std::cerr << "Failed to save to file: " << fileName << std::endl;
-          }
-          break;
+        // case 2:
+        //   printf("Saving to file: %s \n", fileName.c_str()); 
+        //   success = pFileHandler->SaveToFile(this, fileName);
+        //   if(!success){
+        //     std::cerr << "Failed to save to file: " << fileName << std::endl;
+        //   }
+        //   break;
         
         case 3:{
           printf("Reading file: %s \n", fileName.c_str());
@@ -160,11 +159,13 @@ namespace Fitter{
           break;
         }
         case 4:
-          printf("Deleting file: %s\n", fileName.c_str());
-          try {
+          std::printf("Deleting file: %s\n", fileName.c_str());
+          try{
             pFileHandler->DeleteFile(fileName.c_str());
-            printf("----------------------------------------\n");
-            printf("File deletion operation completed.\n");
+            if(!std::filesystem::exists(fileName)){
+              std::printf("File deletion operation completed.\n");
+            }
+            std::printf("----------------------------------------\n");
           } catch(const std::exception& e) {
             std::cerr << "Error during file deletion: " << e.what() << std::endl;
           }
@@ -181,7 +182,7 @@ namespace Fitter{
           break;
 
         default:
-          std::cerr << "Invalid choice!" << std::endl;
+          std::cerr << "Invalid fChoice!" << std::endl;
           break;
       }
       isRunning = false;
