@@ -80,11 +80,10 @@ FsPath_t Utils::GetUserDirectory(std::string_view subdirectory) {
     }
     directory = homeDir;
 #endif
-
     FsPath_t targetDir = directory / subdirectory;
 
-    if (!std::filesystem::exists(targetDir)) {
-      try {
+    if(!std::filesystem::exists(targetDir)){
+      try{
         std::filesystem::create_directory(targetDir);
         std::cout << "Created directory: " << targetDir << std::endl;
       } catch (const std::filesystem::filesystem_error& e) {
@@ -95,7 +94,7 @@ FsPath_t Utils::GetUserDirectory(std::string_view subdirectory) {
         FsPath_t docsDir = directory / "Documents";
         if(std::filesystem::exists(docsDir)) {
           return docsDir;
-          std::cout << "Default directory set: 'Documents'" << std::endl;
+          std::cout << "Default directory set to: 'Documents'" << std::endl;
         }
         return directory;
       }
