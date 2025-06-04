@@ -54,6 +54,10 @@ namespace Fitter{
   void Fitter::Start(){
     std::printf("Welcome to Fitter! \n");
     std::printf("Your personal workout tracking application\n");
+    std::printf("Choose an option: \n");
+    std::printf("1. Log an exercise\n");
+    std::printf("2. Access the file manager\n");
+    std::cin >> choice;
     std::printf("----------------------------------------\n");
     
     // Initialize resources
@@ -68,8 +72,9 @@ namespace Fitter{
     unsigned int reps{0};
     unsigned int sets{0};
     float weight{0.00f};
-
+    
     std::cout << "Enter exercise name: ";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, name);
 
     std::cout << "Enter number of reps: ";
@@ -87,7 +92,7 @@ namespace Fitter{
 
     return Fitter(name, sets, reps, weight, m_time);
   }
-
+  
   void Fitter::Update(){
     while(isRunning){
       try{
