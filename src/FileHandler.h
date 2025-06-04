@@ -54,6 +54,7 @@ public:
     static void ClearScreen();
 
 private:
+    FsPath_t m_referencePath;
     std::string m_fileName;
     std::fstream m_fileStream;
     bool m_isOpen = false;

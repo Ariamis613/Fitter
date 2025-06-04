@@ -65,7 +65,6 @@ namespace FileHandler{
     int FileHandler::DisplayChoice(){
         std::cout << "Please select an option: \n"; 
         std::cout << "1. Create a new file.\n";
-        std::cout << "2. Save to file.\n";
         std::cout << "3. Read from file.\n";
         std::cout << "4. Delete file.\n";
         std::cout << "5. Append to file.\n";
@@ -174,9 +173,9 @@ namespace FileHandler{
         
         try{
             // Resolve the full path similar to other functions
-            const auto userSubdirectory = Utils::GetSubdirectory();
-            auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
-            const auto fullPath = subdirectory / baseFileName;
+            //const auto userSubdirectory = Utils::GetSubdirectory();
+            //auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
+            const auto fullPath = m_referencePath;
             
             // Check if file exists
             if(!std::filesystem::exists(fullPath)){
@@ -232,9 +231,13 @@ namespace FileHandler{
 
             std::ofstream newFile(fullPath);
             
+            
+            
             if(!newFile.is_open()){
                 std::cerr << "Failed to create file: " + fullPath.string();
             }
+
+            m_referencePath = fullPath;
 
             newFile.close();
             
@@ -295,16 +298,16 @@ namespace FileHandler{
     }
 
     void FileHandler::DeleteFile(const char* filePath){
-    const auto userSubdirectory = Utils::GetSubdirectory();
-    auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
-    const auto fullPath = subdirectory / filePath;
+        const auto userSubdirectory = Utils::GetSubdirectory();
+        auto subdirectory = Utils::GetUserDirectory(userSubdirectory);
+        const auto fullPath = subdirectory / filePath;
 
     try{
     if(std::filesystem::exists(fullPath)){
       std::filesystem::remove(fullPath);
       std::cout << "File: " << filePath << " deleted successfully." << std::endl;
 
-    } else{
+    }else{
       std::cout << "File: " << filePath << " doesn't exist." << std::endl;
       return;
     }
