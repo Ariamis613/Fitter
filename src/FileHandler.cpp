@@ -11,9 +11,6 @@
 #include <cstring>  // For strchr and strlen
 
 namespace FileHandler{
-    inline static constexpr int MAX_CHOICE = 6;
-    inline static constexpr int MIN_CHOICE = 1;
-
     FileHandler::FileHandler(std::fstream&& fileStream) : m_fileStream(std::move(fileStream)) {
     }
 

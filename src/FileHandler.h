@@ -22,6 +22,9 @@ namespace Fitter{
 using FsPath_t = std::filesystem::path;
 
 namespace FileHandler{
+    inline static constexpr int MAX_CHOICE = 6;
+    inline static constexpr int MIN_CHOICE = 1;
+
 class FileHandler{
 public:
     FileHandler(std::fstream&& fileStream);

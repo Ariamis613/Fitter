@@ -105,7 +105,8 @@ namespace Fitter{
       const int fChoice = pFileHandler->GetChoice();
       
       // Exit early if user chose to exit
-      if(fChoice == 5){
+      // MAX_CHOICE would always be the exit choice
+      if(fChoice == FileHandler::MAX_CHOICE){
         printf("Exiting the program...\n");
         isRunning = false;
         break;
