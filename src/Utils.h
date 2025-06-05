@@ -28,9 +28,9 @@ public:
         return kgValue * KG_TO_POUNDS;
     }
 
-    // NOTE: Not being used currently
+    // Calculate total volume (sets × reps × weight)
     template<typename T>
-    static T CalculateVolume(int16_t sets, int16_t reps, double weight){
-        return sets * reps * weight;
+    static T CalculateVolume(unsigned int sets, unsigned int reps, double weight){
+        return static_cast<T>(sets * reps * weight);
     }
 };
