@@ -105,7 +105,7 @@ namespace Fitter{
       const int fChoice = pFileHandler->GetChoice();
       
       // Exit early if user chose to exit
-      if(fChoice == 6){
+      if(fChoice == 5){
         printf("Exiting the program...\n");
         isRunning = false;
         break;
@@ -127,12 +127,13 @@ namespace Fitter{
           printf("Creating file: %s \n", fileName.c_str());
           success = pFileHandler->CreateFile(fileName) && pFileHandler->SaveToFile(this, fileName);
           if(success){
-            printf("File %s created successfully!\n", fileName.c_str());
+            std::printf("File %s created and saved successfully!\n", fileName.c_str());
           } else{
             std::cerr << "Failed to create file: " << fileName << std::endl;
           }
           break;
-    
+
+        // @NOTE: Merged with case 1
         // case 2:
         //   printf("Saving to file: %s \n", fileName.c_str()); 
         //   success = pFileHandler->SaveToFile(this, fileName);
@@ -141,7 +142,7 @@ namespace Fitter{
         //   }
         //   break;
         
-        case 3:{
+        case 2:{
           printf("Reading file: %s \n", fileName.c_str());
           auto lines = pFileHandler->ReadFile(fileName);
 
@@ -150,7 +151,6 @@ namespace Fitter{
             printf("The file may be empty or could not be opened.\n");
           } else{
             std::cout << fileName << " contents (" << lines->size() << " lines): " << std::endl;
-            printf("----------------------------------------");
             for(const auto& line : *lines){
               std::cout << line << '\n';
             }
@@ -158,7 +158,7 @@ namespace Fitter{
           }
           break;
         }
-        case 4:
+        case 3:
           std::printf("Deleting file: %s\n", fileName.c_str());
           try{
             pFileHandler->DeleteFile(fileName.c_str());
@@ -171,8 +171,8 @@ namespace Fitter{
           }
           break;
         
-        case 5:
-          printf("Appending to file: %s\n", fileName.c_str());
+        case 4:
+          std::printf("Appending to file: %s\n", fileName.c_str());
           success = pFileHandler->AppendToFile(this, fileName);
           if(!success) {
             std::cerr << "Failed to append to file: " << fileName << std::endl;
