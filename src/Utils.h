@@ -30,7 +30,7 @@ public:
 
     // NOTE: Not being used currently
     template<typename T>
-    static T CalculateVolume(int sets, int reps, double weight){
+    static T CalculateVolume(int16_t sets, int16_t reps, double weight){
         return sets * reps * weight;
     }
 };

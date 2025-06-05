@@ -1,6 +1,7 @@
 #include "App.h"
 #include "FileHandler.h"
 #include "Utils.h"
+#include "database/Database.h"
 
 extern "C"{
   #include <assert.h>
@@ -11,11 +12,20 @@ extern "C"{
 
 namespace Fitter{
   Fitter::Fitter(const std::string name, const unsigned int sets, const unsigned int reps, const float weight,
-    std::time_t localTime) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight), m_time(localTime){
+    std::time_t localTime) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight), m_time(localTime), db("fitter.db"){
     m_weight_lbs = Utils::ConvertToLbs(weight);
+    // Initialize database when creating exercise objects
+    if(!db.InitializeDatabase()){
+        std::cerr << "Warning: Failed to initialize database" << std::endl;
+    }
   }
   
-  Fitter::Fitter() = default;
+  Fitter::Fitter() : db("fitter.db") {
+    // Initialize database for default constructor too
+    if(!db.InitializeDatabase()){
+        std::cerr << "Warning: Failed to initialize database" << std::endl;
+    }
+  }
 
   Fitter::~Fitter(){
     // Clean up resources if necessary
@@ -66,30 +76,77 @@ namespace Fitter{
     isRunning = true;
   }
 
-  Fitter Fitter::DisplayMenu(){
+  Fitter Fitter::TakeInput() const{
     std::string name = "";
     unsigned int reps{0};
     unsigned int sets{0};
     float weight{0.00f};
     
+    // Get exercise name with validation
     std::cout << "Enter exercise name: ";
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::getline(std::cin, name);
+    
+    // Validate name is not empty
+    while(name.empty() || name.find_first_not_of(" \t\n\r") == std::string::npos) {
+        std::cout << "Exercise name cannot be empty. Please enter a valid name: ";
+        std::getline(std::cin, name);
+    }
 
+    // Get reps with validation
     std::cout << "Enter number of reps: ";
-    std::cin >> reps;
+    while(!(std::cin >> reps) || reps == 0) {
+        std::cout << "Please enter a valid number of reps (greater than 0): ";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
 
+    // Get sets with validation
     std::cout << "Enter number of sets: ";
-    std::cin >> sets;
+    while(!(std::cin >> sets) || sets == 0) {
+        std::cout << "Please enter a valid number of sets (greater than 0): ";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
 
+    // Get weight with validation
     std::cout << "Enter weight in kg: ";
-    std::cin >> weight;
+    while(!(std::cin >> weight) || weight < 0) {
+        std::cout << "Please enter a valid weight (0 or greater): ";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+
+    Fitter exercise(name, sets, reps, weight, m_time);
+
+    return exercise;
+  }
+
+  Fitter Fitter::DisplayMenu(){
+    
+    Fitter exercise = TakeInput();
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     FileHandler::FileHandler::ClearScreen();
+    
+    std::cout << "Save to database? (y/n): ";
+    char choice;
+    std::cin >> choice;
 
-    return Fitter(name, sets, reps, weight, m_time);
+    if(choice == 'y' || choice == 'Y'){
+      if(db.SaveToDatabase(exercise)){
+        std::cout << "✓ Exercise saved to database successfully!\n";
+      } else {
+        std::cout << "✗ Failed to save exercise to database.\n";
+      }
+    } else if(choice == 'n' || choice == 'N') {
+        std::cout << "Exercise not saved.\n";
+    } else {
+        std::cout << "Invalid choice. Exercise not saved.\n";
+    }
+    
+    return exercise;
   }
   
   void Fitter::Update(){

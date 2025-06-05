@@ -1,5 +1,7 @@
 #pragma once
 
+#include "database/Database.h"
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -28,11 +30,15 @@ public:
   int GetReps() const {return m_reps;}
   float GetWeightKG() const {return m_weight_kg;}
   float GetWeightLBS() const {return m_weight_lbs;}
+  // Pointer to broken-down time
   std::tm* GetNow() const {return std::localtime(&m_time);}
+  // Raw timestamp
+  std::time_t GetTimestamp() const {return m_time;}
 
   void Start();
   void PrintExerciseObject(const Fitter& ex);
   void Update();
+  Fitter TakeInput() const;
   Fitter DisplayMenu();
   friend std::ostream& operator<<(std::ostream& os, const Fitter& obj);
 
@@ -40,6 +46,7 @@ public:
   int16_t choice = 0;
 
 private:
+  Database::Database db;
   std::shared_ptr<FileHandler::FileHandler> pFileHandler = nullptr;
   std::time_t m_time = std::time(0);
   std::string m_name = "";
