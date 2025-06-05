@@ -1,10 +1,18 @@
 #include "src/App.h"
+#include "src/database/Database.h"
 
 #include <cassert>
 #include <iostream>
+#include <memory>
 
 int main(){
     Fitter::Fitter App;
+    std::unique_ptr<Database::Database> db = std::make_unique<Database::Database>("../fitter.db");
+    
+    if (!db->InitializeDatabase()) {
+        std::cerr << "Failed to initialize database!" << std::endl;
+        return 1;
+    }
 
     App.Start();
 
@@ -17,6 +25,11 @@ int main(){
         // Copy the exercise data to the main App object
         App = exerciseData;
         
+        // Save to database
+        if (db->SaveToDatabase(exerciseData)) {
+            std::cout << "Exercise saved to database!" << std::endl;
+        }
+        
         std::cout << "Exercise logged! Now accessing file manager..." << std::endl;
     } else if(App.choice == 2){
         // User chose to go directly to file manager
@@ -27,6 +40,7 @@ int main(){
 
     while(App.isRunning){
         App.Update();
+        db->CloseDatabase();
     }
 
     return 0;
