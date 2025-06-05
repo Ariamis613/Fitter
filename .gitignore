@@ -57,7 +57,6 @@ Fitter
 *.exp
 
 # IDE files
-.vscode/
 .vs/
 *.vcxproj*
 *.sln
@@ -125,3 +124,11 @@ compile_commands.json
 
 # VS Code settings (user-specific)
 .vscode/
+
+# Database files (user data)
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE files
+.idea/
