@@ -196,6 +196,8 @@ g++ -std=c++23 -O3 -DNDEBUG -Wall -Wextra main.cpp src/*.cpp -o fitter
 - **Standard Library**: `<filesystem>`, `<fstream>`, `<iostream>`, `<memory>`, `<vector>`, `<string>`, `<chrono>`
 - **System Libraries**: Platform-specific environment variable access
 - **Build System**: CMake 3.20+
+- **SQLite3**: For database operations
+- **nlohmann/json**: For JSON parsing
 
 ## Contributing 🤝
 
