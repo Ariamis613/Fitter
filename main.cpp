@@ -20,15 +20,10 @@ int main(){
 
     if(App.choice == 1){
         std::cout << "=== Exercise Logging ===" << std::endl;
-        Fitter::Fitter exerciseData = App.DisplayMenu();
+        Fitter::Fitter exerciseData = App.DisplayMenu(db.get());
         
         // Copy the exercise data to the main App object
         App = exerciseData;
-        
-        // Save to database
-        if (db->SaveToDatabase(exerciseData)) {
-            std::cout << "Exercise saved to database!" << std::endl;
-        }
         
         std::cout << "Exercise logged! Now accessing file manager..." << std::endl;
     } else if(App.choice == 2){
@@ -40,8 +35,7 @@ int main(){
 
     while(App.isRunning){
         App.Update();
-        db->CloseDatabase();
     }
-
+    
     return 0;
 }

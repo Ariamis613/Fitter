@@ -12,19 +12,11 @@ extern "C"{
 
 namespace Fitter{
   Fitter::Fitter(const std::string name, const unsigned int sets, const unsigned int reps, const float weight,
-    std::time_t localTime) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight), m_time(localTime), db("fitter.db"){
+    std::time_t localTime) : m_name(name), m_sets(sets), m_reps(reps), m_weight_kg(weight), m_time(localTime){
     m_weight_lbs = Utils::ConvertToLbs(weight);
-    // Initialize database when creating exercise objects
-    if(!db.InitializeDatabase()){
-        std::cerr << "Warning: Failed to initialize database" << std::endl;
-    }
   }
   
-  Fitter::Fitter() : db("fitter.db") {
-    // Initialize database for default constructor too
-    if(!db.InitializeDatabase()){
-        std::cerr << "Warning: Failed to initialize database" << std::endl;
-    }
+  Fitter::Fitter() {
   }
 
   Fitter::~Fitter(){
@@ -122,7 +114,7 @@ namespace Fitter{
     return exercise;
   }
 
-  Fitter Fitter::DisplayMenu(){
+  Fitter Fitter::DisplayMenu(Database::Database* db){
     
     Fitter exercise = TakeInput();
 
@@ -135,7 +127,7 @@ namespace Fitter{
     std::cin >> choice;
 
     if(choice == 'y' || choice == 'Y'){
-      if(db.SaveToDatabase(exercise)){
+      if(db && db->SaveToDatabase(exercise)){
         std::cout << "✓ Exercise saved to database successfully!\n";
       } else {
         std::cout << "✗ Failed to save exercise to database.\n";

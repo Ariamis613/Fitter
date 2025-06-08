@@ -1,7 +1,5 @@
 #pragma once
 
-#include "database/Database.h"
-
 #include <string>
 #include <vector>
 #include <memory>
@@ -9,9 +7,13 @@
 #include <ctime>
 #include <chrono>
 
-// forward declaration
+// forward declarations
 namespace FileHandler{
   class FileHandler;
+}
+
+namespace Database{
+  class Database;
 }
 
 namespace Fitter{
@@ -39,14 +41,13 @@ public:
   void PrintExerciseObject(const Fitter& ex);
   void Update();
   Fitter TakeInput() const;
-  Fitter DisplayMenu();
+  Fitter DisplayMenu(Database::Database* db = nullptr);
   friend std::ostream& operator<<(std::ostream& os, const Fitter& obj);
 
   bool isRunning = true;
   int16_t choice = 0;
 
 private:
-  Database::Database db;
   std::shared_ptr<FileHandler::FileHandler> pFileHandler = nullptr;
   std::time_t m_time = std::time(0);
   std::string m_name = "";
